@@ -32,11 +32,23 @@ class DnDMapViewer {
         this.gridColor = '#ffffff';
         this.gridOpacity = 0.35;
 
+        // Viewport podglądu
+        this.previewViewport = null;
+        this.previewViewportCanvas = null;
+        this.previewViewportCtx = null;
+        this.viewportPollingInterval = null;
+        this.previewViewportColor = '#ff0000';
+        this.previewViewportVisible = true;
+
+        // Obrót mapy
+        this.rotation = 0;
+
         // Wyczyść stare dane mgły z localStorage (nie są już używane)
         this.clearOldFogDataFromLocalStorage();
 
         this.initElements();
         this.initEvents();
+        this.startViewportPolling();
     }
 
     clearOldFogDataFromLocalStorage() {
@@ -78,7 +90,7 @@ class DnDMapViewer {
         this.gridStatus = document.getElementById('gridStatus');
         this.zoomInBtn = document.getElementById('zoomInBtn');
         this.zoomOutBtn = document.getElementById('zoomOutBtn');
-        this.resetZoomBtn = document.getElementById('resetZoomBtn');
+        this.rotatePreviewBtn = document.getElementById('rotatePreviewBtn');
         this.zoomLevel = document.getElementById('zoomLevel');
         this.navUpBtn = document.getElementById('navUpBtn');
         this.navDownBtn = document.getElementById('navDownBtn');
@@ -98,6 +110,20 @@ class DnDMapViewer {
 
         // Dodatkowe kontrolki koloru mgły w sekcji widok
         this.fogColorPickerView = document.getElementById('fogColorPickerView');
+
+        // Canvas dla viewportu podglądu
+        this.previewViewportCanvas = document.getElementById('previewViewportCanvas');
+        if (this.previewViewportCanvas) {
+            this.previewViewportCtx = this.previewViewportCanvas.getContext('2d');
+        }
+        this.previewViewportColorPicker = document.getElementById('previewViewportColorPicker');
+        this.togglePreviewViewportBtn = document.getElementById('togglePreviewViewportBtn');
+
+        // Elementy obrotu mapy
+        this.rotateLeftBtn = document.getElementById('rotateLeftBtn');
+        this.rotateRightBtn = document.getElementById('rotateRightBtn');
+        this.resetRotationBtn = document.getElementById('resetRotationBtn');
+        this.rotationValue = document.getElementById('rotationValue');
 
         // Nowe elementy dla bocznego panelu
         this.sidebar = document.getElementById('sidebar');
@@ -146,14 +172,14 @@ class DnDMapViewer {
         }
 
         this.resetFogBtn.addEventListener('click', () => this.resetFog());
-        this.zoomInBtn.addEventListener('click', () => this.zoomIn());
-        this.zoomOutBtn.addEventListener('click', () => this.zoomOut());
-        this.resetZoomBtn.addEventListener('click', () => this.resetZoom());
-        this.navUpBtn.addEventListener('click', () => this.panDirection(0, 50));
-        this.navDownBtn.addEventListener('click', () => this.panDirection(0, -50));
-        this.navLeftBtn.addEventListener('click', () => this.panDirection(50, 0));
-        this.navRightBtn.addEventListener('click', () => this.panDirection(-50, 0));
-        this.navCenterBtn.addEventListener('click', () => this.centerMap());
+        this.zoomInBtn.addEventListener('click', () => this.sendPreviewNavigation('zoom', 'in'));
+        this.zoomOutBtn.addEventListener('click', () => this.sendPreviewNavigation('zoom', 'out'));
+        this.rotatePreviewBtn.addEventListener('click', () => this.rotatePreview());
+        this.navUpBtn.addEventListener('click', () => this.sendPreviewNavigation('pan', 'up'));
+        this.navDownBtn.addEventListener('click', () => this.sendPreviewNavigation('pan', 'down'));
+        this.navLeftBtn.addEventListener('click', () => this.sendPreviewNavigation('pan', 'left'));
+        this.navRightBtn.addEventListener('click', () => this.sendPreviewNavigation('pan', 'right'));
+        this.navCenterBtn.addEventListener('click', () => this.sendPreviewNavigation('center', null));
         this.mapContainer.addEventListener('wheel', e => this.handleWheel(e));
         document.addEventListener('keydown', e => {
             if(e.key === 'Alt'){
@@ -210,6 +236,25 @@ class DnDMapViewer {
         // Event listenery dla kontrolek kolorów siatki
         if(this.gridColorPicker) {
             this.gridColorPicker.addEventListener('change', () => this.updateGridColor());
+        }
+
+        // Event listenery dla viewport podglądu
+        if(this.previewViewportColorPicker) {
+            this.previewViewportColorPicker.addEventListener('change', () => this.updatePreviewViewportColor());
+        }
+        if(this.togglePreviewViewportBtn) {
+            this.togglePreviewViewportBtn.addEventListener('click', () => this.togglePreviewViewport());
+        }
+
+        // Event listenery dla obrotu mapy
+        if(this.rotateLeftBtn) {
+            this.rotateLeftBtn.addEventListener('click', () => this.rotateMap(-90));
+        }
+        if(this.rotateRightBtn) {
+            this.rotateRightBtn.addEventListener('click', () => this.rotateMap(90));
+        }
+        if(this.resetRotationBtn) {
+            this.resetRotationBtn.addEventListener('click', () => this.resetRotation());
         }
 
         // Obsługa bocznego panelu
@@ -269,7 +314,8 @@ class DnDMapViewer {
                 this.setupCanvases();
                 this.loadFogState();
                 this.loadGridConfig();
-                this.resetZoom();
+                this.resetZoom(); // Reset przed załadowaniem ustawień
+                this.loadMapSettings(); // Wczytaj zapisane ustawienia mapy - nadpisze reset
 
                 // Rozpocznij synchronizację mgły
                 this.startFogSynchronization();
@@ -719,32 +765,54 @@ class DnDMapViewer {
     zoomIn(){
         this.zoom = Math.min(this.zoom * 1.2, 5);
         this.applyTransform();
+        this.saveMapSettings();
     }
 
     zoomOut(){
         this.zoom = Math.max(this.zoom / 1.2, 0.1);
         this.applyTransform();
+        this.saveMapSettings();
     }
 
     resetZoom(){
         this.zoom = 1;
         this.panOffset = {x: 0, y: 0};
         this.applyTransform();
+        this.saveMapSettings();
     }
 
     panDirection(dx, dy){
         this.panOffset.x += dx;
         this.panOffset.y += dy;
         this.applyTransform();
+        this.saveMapSettings();
     }
 
     centerMap(){
         this.panOffset = {x: 0, y: 0};
         this.applyTransform();
+        this.saveMapSettings();
     }
 
     applyTransform(){
-        this.mapWrapper.style.transform = `scale(${this.zoom}) translate(${this.panOffset.x}px,${this.panOffset.y}px)`;
+        // Ustaw punkt obrotu na środek kontenera
+        if (this.mapWrapper && this.mapContainer) {
+            const containerWidth = this.mapContainer.clientWidth;
+            const containerHeight = this.mapContainer.clientHeight;
+
+            // Ustaw transform-origin na środek widocznego obszaru
+            this.mapWrapper.style.transformOrigin = `${containerWidth / 2}px ${containerHeight / 2}px`;
+        }
+
+        // Zastosuj transformacje: translate, scale, rotate
+        const transforms = [];
+        transforms.push(`translate(${this.panOffset.x}px, ${this.panOffset.y}px)`);
+        transforms.push(`scale(${this.zoom})`);
+        if (this.rotation !== 0) {
+            transforms.push(`rotate(${this.rotation}deg)`);
+        }
+
+        this.mapWrapper.style.transform = transforms.join(' ');
         this.zoomLevel.textContent = Math.round(this.zoom * 100) + '%';
     }
 
@@ -1120,12 +1188,174 @@ class DnDMapViewer {
     updateFogColorFromView() {
         this.fogColor = this.fogColorPickerView.value;
         this.renderFog();
+        this.saveMapSettings();
     }
 
     // Metody obsługi kolorów siatki
     updateGridColor() {
         this.gridColor = this.gridColorPicker.value;
         this.drawGrid();
+        this.saveMapSettings();
+    }
+
+    // Metody obsługi viewport podglądu
+    updatePreviewViewportColor() {
+        this.previewViewportColor = this.previewViewportColorPicker.value;
+        this.drawPreviewViewport();
+        this.saveMapSettings();
+    }
+
+    togglePreviewViewport() {
+        this.previewViewportVisible = !this.previewViewportVisible;
+        if (this.previewViewportVisible) {
+            this.drawPreviewViewport();
+            if (this.togglePreviewViewportBtn) {
+                this.togglePreviewViewportBtn.textContent = 'Ukryj podgląd';
+            }
+        } else {
+            if (this.previewViewportCanvas) {
+                this.previewViewportCtx.clearRect(0, 0, this.previewViewportCanvas.width, this.previewViewportCanvas.height);
+            }
+            if (this.togglePreviewViewportBtn) {
+                this.togglePreviewViewportBtn.textContent = 'Pokaż podgląd';
+            }
+        }
+        this.saveMapSettings();
+    }
+
+    // Metody obsługi obrotu mapy
+    rotateMap(degrees) {
+        this.rotation = (this.rotation + degrees + 360) % 360;
+        this.updateRotationDisplay();
+        this.applyTransform();
+        this.saveMapSettings();
+        // Wyślij polecenie obrotu do podglądu
+        this.sendRotationToPreview();
+    }
+
+    resetRotation() {
+        this.rotation = 0;
+        this.updateRotationDisplay();
+        this.applyTransform();
+        this.saveMapSettings();
+        // Wyślij polecenie obrotu do podglądu
+        this.sendRotationToPreview();
+    }
+
+    updateRotationDisplay() {
+        if (this.rotationValue) {
+            this.rotationValue.textContent = `${this.rotation}°`;
+        }
+    }
+
+    sendRotationToPreview() {
+        const command = {
+            action: 'rotate',
+            rotation: this.rotation
+        };
+        fetch('/api/preview-map/navigation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(command)
+        }).catch(err => console.error('Error sending rotation command:', err));
+    }
+
+    // Funkcja do obracania tylko podglądu (bez obracania mapy na index)
+    rotatePreview() {
+        const command = {
+            action: 'rotatePreview',
+            degrees: 90
+        };
+        fetch('/api/preview-map/navigation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(command)
+        }).catch(err => console.error('Error sending rotation command:', err));
+    }
+
+
+    // Metody zapisywania i wczytywania ustawień mapy
+    saveMapSettings() {
+        if (!this.currentMap) return;
+
+        const settings = {
+            rotation: this.rotation,
+            zoom: this.zoom,
+            panOffset: this.panOffset,
+            gridColor: this.gridColor,
+            fogColor: this.fogColor,
+            previewViewportColor: this.previewViewportColor,
+            previewViewportVisible: this.previewViewportVisible,
+            gridVisible: this.gridVisible
+        };
+
+        localStorage.setItem(`map_settings_${this.currentMap.name}`, JSON.stringify(settings));
+    }
+
+    loadMapSettings() {
+        if (!this.currentMap) return;
+
+        const savedSettings = localStorage.getItem(`map_settings_${this.currentMap.name}`);
+        if (!savedSettings) return;
+
+        try {
+            const settings = JSON.parse(savedSettings);
+
+            // Przywróć ustawienia
+            if (settings.rotation !== undefined) {
+                this.rotation = settings.rotation;
+                this.updateRotationDisplay();
+            }
+
+            if (settings.zoom !== undefined) {
+                this.zoom = settings.zoom;
+                if (this.zoomLevel) {
+                    this.zoomLevel.textContent = `${Math.round(this.zoom * 100)}%`;
+                }
+            }
+
+            if (settings.panOffset !== undefined) {
+                this.panOffset = settings.panOffset;
+            }
+
+            if (settings.gridColor) {
+                this.gridColor = settings.gridColor;
+                if (this.gridColorPicker) {
+                    this.gridColorPicker.value = settings.gridColor;
+                }
+            }
+
+            if (settings.fogColor) {
+                this.fogColor = settings.fogColor;
+                if (this.fogColorPickerView) {
+                    this.fogColorPickerView.value = settings.fogColor;
+                }
+            }
+
+            if (settings.previewViewportColor) {
+                this.previewViewportColor = settings.previewViewportColor;
+                if (this.previewViewportColorPicker) {
+                    this.previewViewportColorPicker.value = settings.previewViewportColor;
+                }
+            }
+
+            if (settings.previewViewportVisible !== undefined) {
+                this.previewViewportVisible = settings.previewViewportVisible;
+                if (this.togglePreviewViewportBtn) {
+                    this.togglePreviewViewportBtn.textContent = settings.previewViewportVisible ? 'Ukryj podgląd' : 'Pokaż podgląd';
+                }
+            }
+
+            if (settings.gridVisible !== undefined) {
+                this.gridVisible = settings.gridVisible;
+            }
+
+            // Zastosuj transformacje
+            this.applyTransform();
+
+        } catch (e) {
+            console.error('Error loading map settings:', e);
+        }
     }
 
     // Metoda do konwersji hex na rgba
@@ -1134,6 +1364,109 @@ class DnDMapViewer {
         const g = parseInt(hex.slice(3, 5), 16);
         const b = parseInt(hex.slice(5, 7), 16);
         return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    // Funkcje do sterowania podglądem
+    sendPreviewNavigation(action, direction) {
+        const command = { action: action };
+        if (direction) {
+            command.direction = direction;
+        }
+        fetch('/api/preview-map/navigation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(command)
+        }).catch(err => console.error('Error sending navigation command:', err));
+    }
+
+    startViewportPolling() {
+        if (this.viewportPollingInterval) {
+            clearInterval(this.viewportPollingInterval);
+        }
+        this.viewportPollingInterval = setInterval(() => {
+            this.fetchPreviewViewport();
+        }, 200); // Poll co 200ms
+    }
+
+    async fetchPreviewViewport() {
+        try {
+            const res = await fetch('/api/preview-map/viewport');
+            if (res.ok) {
+                const viewport = await res.json();
+                if (viewport && viewport.mapWidth) {
+                    this.previewViewport = viewport;
+                    this.drawPreviewViewport();
+                }
+            }
+        } catch (err) {
+            // Cicho ignoruj błędy - podgląd może nie być aktywny
+        }
+    }
+
+    drawPreviewViewport() {
+        if (!this.previewViewport || !this.previewViewportCanvas || !this.currentMap) {
+            return;
+        }
+
+        // Sprawdź czy viewport jest dla aktualnej mapy
+        if (this.previewViewport.mapWidth !== this.currentMap.width ||
+            this.previewViewport.mapHeight !== this.currentMap.height) {
+            return;
+        }
+
+        // Ustaw rozmiar canvas
+        if (this.previewViewportCanvas.width !== this.currentMap.width ||
+            this.previewViewportCanvas.height !== this.currentMap.height) {
+            this.previewViewportCanvas.width = this.currentMap.width;
+            this.previewViewportCanvas.height = this.currentMap.height;
+        }
+
+        // Wyczyść canvas
+        this.previewViewportCtx.clearRect(0, 0, this.previewViewportCanvas.width, this.previewViewportCanvas.height);
+
+        // Jeśli viewport jest ukryty, zakończ
+        if (!this.previewViewportVisible) {
+            return;
+        }
+
+        // Pokaż canvas jeśli jest ukryty
+        if (this.previewViewportCanvas.classList.contains('hidden')) {
+            this.previewViewportCanvas.classList.remove('hidden');
+        }
+
+        // Konwertuj hex na rgba
+        const hexToRgba = (hex, alpha) => {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        };
+
+        // Narysuj ramkę viewportu uwzględniając obrót
+        const vp = this.previewViewport;
+
+        this.previewViewportCtx.save();
+
+        // Jeśli jest obrót, zastosuj go do rysowania ramki
+        if (vp.rotation && vp.rotation !== 0) {
+            // Przesuń kontekst do środka viewportu
+            const centerX = vp.x + vp.width / 2;
+            const centerY = vp.y + vp.height / 2;
+            this.previewViewportCtx.translate(centerX, centerY);
+            this.previewViewportCtx.rotate((vp.rotation * Math.PI) / 180);
+            this.previewViewportCtx.translate(-centerX, -centerY);
+        }
+
+        this.previewViewportCtx.strokeStyle = hexToRgba(this.previewViewportColor, 0.9);
+        this.previewViewportCtx.lineWidth = 4;
+        this.previewViewportCtx.strokeRect(vp.x, vp.y, vp.width, vp.height);
+
+        this.previewViewportCtx.restore();
+
+        // Aktualizuj przycisk zoomLevel z wartością zoom z podglądu
+        if (this.zoomLevel) {
+            this.zoomLevel.textContent = `${Math.round(vp.zoom * 100)}%`;
+        }
     }
 
     // Funkcja renderowania mgły
@@ -1194,12 +1527,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if(setPreviewBtn) {
         setPreviewBtn.onclick = () => {
             const m = document.getElementById('mapSelect').value;
-            if(!m) return alert('Wybierz mapę!');
+            if(!m) return;
             fetch('/api/preview-map', {
                 method: 'POST',
                 headers: {'Content-Type': 'text/plain'},
                 body: m
-            }).then(() => alert('Mapa podglądu ustawiona'));
+            });
         };
     }
 });

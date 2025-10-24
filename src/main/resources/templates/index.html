@@ -46,15 +46,15 @@
                     </div>
                     <div class="section-content expanded" id="fog-management">
                         <div class="fog-controls">
-                            <button id="paintFogBtn" class="mdc-button mdc-button--outlined fog-btn">
-                                <span class="mdc-button__ripple"></span>
-                                <i class="material-icons mdc-button__icon">brush</i>
-                                <span class="mdc-button__label">Maluj mgłę</span>
-                            </button>
                             <button id="eraseFogBtn" class="mdc-button mdc-button--outlined fog-btn">
                                 <span class="mdc-button__ripple"></span>
                                 <i class="material-icons mdc-button__icon">cleaning_services</i>
                                 <span class="mdc-button__label">Usuń mgłę</span>
+                            </button>
+                            <button id="paintFogBtn" class="mdc-button mdc-button--outlined fog-btn">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">brush</i>
+                                <span class="mdc-button__label">Maluj mgłę</span>
                             </button>
                             <button id="resetFogBtn" class="mdc-button mdc-button--outlined fog-btn fog-btn--danger">
                                 <span class="mdc-button__ripple"></span>
@@ -91,6 +91,33 @@
                                 <i class="material-icons mdc-button__icon">grid_on</i>
                                 <span class="mdc-button__label">Pokaż/Ukryj siatka</span>
                             </button>
+                            <button id="togglePreviewViewportBtn" class="mdc-button mdc-button--outlined">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">visibility</i>
+                                <span class="mdc-button__label">Ukryj podgląd</span>
+                            </button>
+                        </div>
+
+                        <div class="rotation-control">
+                            <label>Obrót mapy:</label>
+                            <div class="rotation-buttons">
+                                <button id="rotateLeftBtn" class="mdc-button mdc-button--outlined rotation-btn">
+                                    <span class="mdc-button__ripple"></span>
+                                    <i class="material-icons mdc-button__icon">rotate_left</i>
+                                    <span class="mdc-button__label">-90°</span>
+                                </button>
+                                <span id="rotationValue" class="rotation-value">0°</span>
+                                <button id="rotateRightBtn" class="mdc-button mdc-button--outlined rotation-btn">
+                                    <span class="mdc-button__ripple"></span>
+                                    <i class="material-icons mdc-button__icon">rotate_right</i>
+                                    <span class="mdc-button__label">+90°</span>
+                                </button>
+                            </div>
+                            <button id="resetRotationBtn" class="mdc-button mdc-button--outlined">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">restart_alt</i>
+                                <span class="mdc-button__label">Reset obrotu</span>
+                            </button>
                         </div>
 
                         <div class="grid-color-controls">
@@ -104,6 +131,13 @@
                             <div class="color-control">
                                 <label for="fogColorPickerView">Kolor mgły:</label>
                                 <input type="color" id="fogColorPickerView" value="#808080" class="color-picker">
+                            </div>
+                        </div>
+
+                        <div class="fog-color-controls">
+                            <div class="color-control">
+                                <label for="previewViewportColorPicker">Kolor ramki podglądu:</label>
+                                <input type="color" id="previewViewportColorPicker" value="#ff0000" class="color-picker">
                             </div>
                         </div>
                     </div>
@@ -191,29 +225,30 @@
 
         <!-- Main Content Area -->
         <div class="main-content">
-            <div class="map-container" id="mapContainer">
-                <div class="left-controls">
-                    <div class="navigation-controls">
-                        <div class="nav-row"><button id="navUpBtn" class="nav-btn" title="Góra">▲</button></div>
-                        <div class="nav-row">
-                            <button id="navLeftBtn" class="nav-btn" title="Lewo">◀</button>
-                            <button id="navCenterBtn" class="nav-btn" title="Wycentruj">⚫</button>
-                            <button id="navRightBtn" class="nav-btn" title="Prawo">▶</button>
-                        </div>
-                        <div class="nav-row"><button id="navDownBtn" class="nav-btn" title="Dół">▼</button></div>
+            <div class="left-controls">
+                <div class="navigation-controls">
+                    <div class="nav-row"><button id="navUpBtn" class="nav-btn" title="Góra">▲</button></div>
+                    <div class="nav-row">
+                        <button id="navLeftBtn" class="nav-btn" title="Lewo">◀</button>
+                        <button id="navCenterBtn" class="nav-btn" title="Wycentruj">⚫</button>
+                        <button id="navRightBtn" class="nav-btn" title="Prawo">▶</button>
                     </div>
-                    <div class="zoom-controls">
-                        <button id="zoomInBtn" class="zoom-btn" title="Powiększ">+</button>
-                        <div id="zoomLevel" class="zoom-level">100%</div>
-                        <button id="zoomOutBtn" class="zoom-btn" title="Pomniejsz">-</button>
-                        <button id="resetZoomBtn" class="zoom-btn" title="Reset zoom">↻</button>
-                    </div>
+                    <div class="nav-row"><button id="navDownBtn" class="nav-btn" title="Dół">▼</button></div>
                 </div>
+                <div class="zoom-controls">
+                    <button id="zoomInBtn" class="zoom-btn" title="Powiększ">+</button>
+                    <div id="zoomLevel" class="zoom-level">100%</div>
+                    <button id="zoomOutBtn" class="zoom-btn" title="Pomniejsz">-</button>
+                    <button id="rotatePreviewBtn" class="zoom-btn" title="Obróć podgląd">🔄</button>
+                </div>
+            </div>
+            <div class="map-container" id="mapContainer">
                 <div class="map-wrapper" id="mapWrapper">
                     <img id="mapImage" class="map-image hidden" alt="Mapa DnD">
                     <canvas id="gridCanvas" class="fog-layer hidden" style="z-index:5;"></canvas>
                     <canvas id="fogCanvas" class="fog-layer hidden"></canvas>
                     <canvas id="calibrationCanvas" class="fog-layer hidden"></canvas>
+                    <canvas id="previewViewportCanvas" class="fog-layer hidden" style="z-index:15;"></canvas>
                 </div>
             </div>
         </div>

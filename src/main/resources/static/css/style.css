@@ -539,7 +539,7 @@ body {
 .left-controls {
     position: absolute;
     top: 20px;
-    left: 20px;
+    right: 20px;
     z-index: 20;
     display: flex;
     flex-direction: column;
@@ -609,10 +609,44 @@ body {
 }
 
 /* Color Controls */
-.color-controls, .grid-color-controls {
+.color-controls, .grid-color-controls, .fog-color-controls {
     margin-top: 16px;
     padding-top: 16px;
     border-top: 1px solid var(--border-color);
+}
+
+.rotation-control {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+}
+
+.rotation-control label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.rotation-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.rotation-btn {
+    flex: 1;
+}
+
+.rotation-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--mdc-theme-primary);
+    min-width: 50px;
+    text-align: center;
 }
 
 .color-control {

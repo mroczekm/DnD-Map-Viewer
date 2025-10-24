@@ -5,17 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DnD Map Podgląd</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #1a1a1a; color: #fff; }
-        .header { background-color: #2c2c2c; padding: 10px 20px; border-bottom: 2px solid #444; }
-        .map-container { position: relative; overflow: auto; height: calc(100vh - 60px); background-color: #000; }
-        .map-wrapper { position: relative; display: inline-block; transform-origin: 0 0; }
-        .map-image { display: block; max-width: none; position: relative; user-select: none; }
-        .fog-layer { position: absolute; top: 0; left: 0; z-index: 10; user-select: none; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+        .map-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #000;
+        }
+        .map-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: 0 0;
+        }
+        .map-image {
+            display: block;
+            max-width: none;
+            position: relative;
+            user-select: none;
+        }
+        .fog-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
-    <div class="map-container">
-        <div class="map-wrapper">
+    <div class="map-container" id="mapContainer">
+        <div class="map-wrapper" id="mapWrapper">
             <img id="mapImage" class="map-image" th:src="@{/api/maps/{mapName}(mapName=${mapName})}" alt="Mapa" />
             <canvas id="fogLayer" class="fog-layer"></canvas>
         </div>
@@ -34,12 +64,172 @@
         let gridSize = null;
         let gridOffsetX = 0;
         let gridOffsetY = 0;
-        let isDragging = false;
-        let lastRevealedCells = new Set();
 
         // Zmienne dla kolorów mgły
         let fogColor = '#808080';
         let fogOpacity = 0.65;
+
+        // Zmienne dla viewportu i zoom
+        let zoom = 1;
+        let panX = 0;
+        let panY = 0;
+        let rotation = 0;
+        const mapContainer = document.getElementById('mapContainer');
+        const mapWrapper = document.getElementById('mapWrapper');
+
+        // Funkcja do aktualizacji transformacji
+        function updateTransform() {
+            if (!mapImage.complete) return;
+
+            // Oblicz pozycję wrapper - chcemy żeby środek obrazu był w środku ekranu + pan
+            const containerWidth = mapContainer.clientWidth;
+            const containerHeight = mapContainer.clientHeight;
+            const imageWidth = mapImage.naturalWidth;
+            const imageHeight = mapImage.naturalHeight;
+
+            // Środek obrazu ma być w (containerWidth/2 + panX, containerHeight/2 + panY)
+            // Więc lewy górny róg obrazu (który jest w pozycji 0,0 w wrapper) musi być w:
+            const wrapperX = containerWidth / 2 + panX - (imageWidth * zoom) / 2;
+            const wrapperY = containerHeight / 2 + panY - (imageHeight * zoom) / 2;
+
+            // Zastosuj transformacje
+            const transforms = [];
+            transforms.push(`translate(${wrapperX}px, ${wrapperY}px)`);
+            transforms.push(`scale(${zoom})`);
+
+            if (rotation !== 0) {
+                // Dla obrotu musimy zmienić transform-origin na środek obrazu
+                mapWrapper.style.transformOrigin = `${imageWidth / 2}px ${imageHeight / 2}px`;
+                transforms.push(`rotate(${rotation}deg)`);
+            } else {
+                mapWrapper.style.transformOrigin = '0 0';
+            }
+
+            mapWrapper.style.transform = transforms.join(' ');
+            reportViewport();
+        }
+
+        // Funkcja do pobierania poleceń nawigacji z serwera
+        function pollNavigationCommands() {
+            setInterval(() => {
+                fetch('/api/preview-map/navigation')
+                    .then(res => res.json())
+                    .then(command => {
+                        if (command && command.action) {
+                            handleNavigationCommand(command);
+                        }
+                    })
+                    .catch(err => console.error('Error polling navigation:', err));
+            }, 100);
+        }
+
+        // Obsługa poleceń nawigacji
+        function handleNavigationCommand(command) {
+            const step = 100;
+            switch(command.action) {
+                case 'pan':
+                    if (command.direction === 'up') {
+                        panY += step;
+                    } else if (command.direction === 'down') {
+                        panY -= step;
+                    } else if (command.direction === 'left') {
+                        panX += step;
+                    } else if (command.direction === 'right') {
+                        panX -= step;
+                    }
+                    updateTransform();
+                    break;
+                case 'zoom':
+                    if (command.direction === 'in') {
+                        zoom = Math.min(zoom * 1.2, 5);
+                    } else if (command.direction === 'out') {
+                        zoom = Math.max(zoom / 1.2, 0.1);
+                    } else if (command.direction === 'reset') {
+                        zoom = 1;
+                        panX = 0;
+                        panY = 0;
+                    }
+                    updateTransform();
+                    break;
+                case 'rotate':
+                    if (command.rotation !== undefined) {
+                        rotation = command.rotation;
+                        updateTransform();
+                    }
+                    break;
+                case 'rotatePreview':
+                    // Obrót o podaną liczbę stopni (domyślnie 90)
+                    const degrees = command.degrees || 90;
+                    rotation = (rotation + degrees + 360) % 360;
+                    updateTransform();
+                    break;
+                case 'center':
+                    // Wycentruj mapę
+                    panX = 0;
+                    panY = 0;
+                    updateTransform();
+                    break;
+            }
+        }
+
+        // Raportowanie viewport do serwera
+        function reportViewport() {
+            if (!mapImage.complete || !previewMapName) return;
+
+            const containerWidth = mapContainer.clientWidth;
+            const containerHeight = mapContainer.clientHeight;
+            const imageWidth = mapImage.naturalWidth;
+            const imageHeight = mapImage.naturalHeight;
+
+            // Wrapper jest w pozycji tak, że lewy górny róg obrazu jest w:
+            // wrapperX = containerWidth/2 + panX - (imageWidth * zoom) / 2
+            // wrapperY = containerHeight/2 + panY - (imageHeight * zoom) / 2
+
+            const wrapperX = containerWidth / 2 + panX - (imageWidth * zoom) / 2;
+            const wrapperY = containerHeight / 2 + panY - (imageHeight * zoom) / 2;
+
+            // Lewy górny róg widocznego obszaru ekranu to (0, 0)
+            // Offset widocznego obszaru względem obrazu (w pikselach ekranu po zoom):
+            const offsetX = 0 - wrapperX;
+            const offsetY = 0 - wrapperY;
+
+            // Przelicz na piksele oryginału obrazu (przed zoom):
+            const visibleLeft = offsetX / zoom;
+            const visibleTop = offsetY / zoom;
+            const visibleWidth = containerWidth / zoom;
+            const visibleHeight = containerHeight / zoom;
+
+            console.log('Viewport Debug:', {
+                panX, panY, zoom,
+                containerWidth, containerHeight,
+                imageWidth, imageHeight,
+                wrapperX, wrapperY,
+                offsetX, offsetY,
+                visibleLeft, visibleTop, visibleWidth, visibleHeight
+            });
+
+            const viewport = {
+                x: visibleLeft,
+                y: visibleTop,
+                width: visibleWidth,
+                height: visibleHeight,
+                zoom: zoom,
+                rotation: rotation,
+                mapWidth: imageWidth,
+                mapHeight: imageHeight
+            };
+
+            fetch('/api/preview-map/viewport', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(viewport)
+            }).catch(err => console.error('Error reporting viewport:', err));
+        }
+
+        // Raportuj viewport przy resize
+        window.addEventListener('resize', () => {
+            reportViewport();
+        });
 
         function fetchPreviewMapName() {
             return fetch('/api/preview-map')
@@ -58,6 +248,8 @@
                     mapInfo = data;
                     mapImage.src = `/api/map-files/${mapInfo.filename}`;
                     mapImage.onload = () => {
+                        // Wycentruj mapę i zgłoś viewport
+                        updateTransform();
                         renderFog();
                     };
                 });
@@ -93,91 +285,6 @@
                 .catch(() => { gridSize = null; });
         }
 
-        function getMousePos(e) {
-            const rect = fogLayer.getBoundingClientRect();
-            const scaleX = fogLayer.width / rect.width;
-            const scaleY = fogLayer.height / rect.height;
-            return {
-                x: (e.clientX - rect.left) * scaleX,
-                y: (e.clientY - rect.top) * scaleY
-            };
-        }
-
-        function getGridCell(x, y) {
-            if (!gridSize) return null;
-            const adjustedX = x - gridOffsetX;
-            const adjustedY = y - gridOffsetY;
-            const cellX = Math.floor(adjustedX / gridSize) * gridSize + gridOffsetX;
-            const cellY = Math.floor(adjustedY / gridSize) * gridSize + gridOffsetY;
-            return { x: cellX, y: cellY };
-        }
-
-        function revealGridCell(cellX, cellY) {
-            const cellKey = `${cellX},${cellY}`;
-            if (lastRevealedCells.has(cellKey)) return;
-
-            lastRevealedCells.add(cellKey);
-
-            // Wyślij żądanie odsłonięcia kratki
-            fetch(`/api/fog/${previewMapName}/reveal-cell`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    x: cellX + gridSize/2,
-                    y: cellY + gridSize/2,
-                    radius: gridSize/2,
-                    isGridCell: true
-                })
-            });
-        }
-
-        // Obsługa myszy
-        fogLayer.addEventListener('mousedown', (e) => {
-            if (e.button === 0) {
-                isDragging = true;
-                lastRevealedCells.clear();
-                handleReveal(e);
-            }
-        });
-
-        fogLayer.addEventListener('mousemove', (e) => {
-            if (isDragging) {
-                handleReveal(e);
-            }
-        });
-
-        fogLayer.addEventListener('mouseup', () => {
-            isDragging = false;
-            lastRevealedCells.clear();
-        });
-
-        fogLayer.addEventListener('mouseleave', () => {
-            isDragging = false;
-            lastRevealedCells.clear();
-        });
-
-        function handleReveal(e) {
-            const pos = getMousePos(e);
-
-            if (gridSize) {
-                // Tryb siatki - odsłoń całą kratkę
-                const cell = getGridCell(pos.x, pos.y);
-                if (cell) {
-                    revealGridCell(cell.x, cell.y);
-                }
-            } else {
-                // Tryb klasyczny - odsłoń okrągły obszar
-                fetch(`/api/fog/${previewMapName}/reveal-point`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        x: pos.x,
-                        y: pos.y,
-                        radius: 30
-                    })
-                });
-            }
-        }
 
         // Prostszy i szybszy szum
         function fastNoise(x, y, seed = 0) {
@@ -303,6 +410,8 @@
                 startPollingFog();
                 pollRefreshRequest();
                 startFogAnimation();
+                pollNavigationCommands(); // Nasłuchuj poleceń nawigacji
+                setTimeout(reportViewport, 1000); // Wyślij początkowy viewport
             });
         };
     </script>

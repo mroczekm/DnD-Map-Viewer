@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/preview-map")
 public class PreviewMapController {
@@ -40,5 +42,29 @@ public class PreviewMapController {
         boolean refresh = previewMapService.isRefreshRequested();
         if (refresh) previewMapService.clearRefreshRequest();
         return ResponseEntity.ok(refresh);
+    }
+
+    @PostMapping("/navigation")
+    public ResponseEntity<Void> sendNavigationCommand(@RequestBody Map<String, String> command) {
+        previewMapService.setNavigationCommand(command);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/navigation")
+    public ResponseEntity<Map<String, String>> getNavigationCommand() {
+        Map<String, String> command = previewMapService.getNavigationCommand();
+        return ResponseEntity.ok(command);
+    }
+
+    @PostMapping("/viewport")
+    public ResponseEntity<Void> updateViewport(@RequestBody Map<String, Object> viewport) {
+        previewMapService.setViewport(viewport);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/viewport")
+    public ResponseEntity<Map<String, Object>> getViewport() {
+        Map<String, Object> viewport = previewMapService.getViewport();
+        return ResponseEntity.ok(viewport);
     }
 }
