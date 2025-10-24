@@ -77,6 +77,74 @@
                     </div>
                 </div>
 
+                <!-- Characters Section -->
+                <div class="control-section">
+                    <div class="section-toggle" data-target="characters-management">
+                        <i class="material-icons">people</i>
+                        <span>Postacie</span>
+                        <i class="material-icons toggle-icon">expand_less</i>
+                    </div>
+                    <div class="section-content expanded" id="characters-management">
+                        <div class="character-info">
+                            <p class="info-text">
+                                <i class="material-icons info-icon">info</i>
+                                Kliknij przycisk, następnie kliknij na kratkę. SHIFT+przeciągnij aby przenieść postać.
+                            </p>
+                        </div>
+                        <div class="character-mode-controls">
+                            <button id="addPlayerBtn" class="mdc-button mdc-button--outlined character-btn">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">person</i>
+                                <span class="mdc-button__label">Dodaj gracza</span>
+                            </button>
+                            <button id="addEnemyBtn" class="mdc-button mdc-button--outlined character-btn">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">dangerous</i>
+                                <span class="mdc-button__label">Dodaj wroga</span>
+                            </button>
+                            <button id="removeCharacterBtn" class="mdc-button mdc-button--outlined character-btn character-btn--danger">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">delete</i>
+                                <span class="mdc-button__label">Usuń postać</span>
+                            </button>
+                        </div>
+
+                        <div class="character-delete-controls">
+                            <button id="removeLastPlayerBtn" class="mdc-button mdc-button--outlined character-btn-small">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">person_remove</i>
+                                <span class="mdc-button__label">Usuń ostatniego gracza</span>
+                            </button>
+                            <button id="removeAllPlayersBtn" class="mdc-button mdc-button--outlined character-btn-small character-btn--danger">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">group_remove</i>
+                                <span class="mdc-button__label">Usuń graczy</span>
+                            </button>
+                            <button id="removeLastEnemyBtn" class="mdc-button mdc-button--outlined character-btn-small">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">remove_circle</i>
+                                <span class="mdc-button__label">Usuń ostatniego wroga</span>
+                            </button>
+                            <button id="removeAllEnemiesBtn" class="mdc-button mdc-button--outlined character-btn-small character-btn--danger">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">clear_all</i>
+                                <span class="mdc-button__label">Usuń wrogów</span>
+                            </button>
+                        </div>
+
+                        <div class="character-color-controls">
+                            <div class="color-control">
+                                <label for="playerColorPicker">Kolor gracza:</label>
+                                <input type="color" id="playerColorPicker" value="#00ff00" class="color-picker">
+                            </div>
+                            <div class="color-control">
+                                <label for="enemyColorPicker">Kolor wroga:</label>
+                                <input type="color" id="enemyColorPicker" value="#ff0000" class="color-picker">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- View Section -->
                 <div class="control-section">
                     <div class="section-toggle" data-target="view-settings">
@@ -249,6 +317,7 @@
                     <canvas id="fogCanvas" class="fog-layer hidden"></canvas>
                     <canvas id="calibrationCanvas" class="fog-layer hidden"></canvas>
                     <canvas id="previewViewportCanvas" class="fog-layer hidden" style="z-index:15;"></canvas>
+                    <canvas id="charactersCanvas" class="fog-layer hidden" style="z-index:20;"></canvas>
                 </div>
             </div>
         </div>

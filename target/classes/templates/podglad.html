@@ -48,6 +48,7 @@
         <div class="map-wrapper" id="mapWrapper">
             <img id="mapImage" class="map-image" th:src="@{/api/maps/{mapName}(mapName=${mapName})}" alt="Mapa" />
             <canvas id="fogLayer" class="fog-layer"></canvas>
+            <canvas id="charactersLayer" class="fog-layer" style="z-index: 20;"></canvas>
         </div>
     </div>
     <script>
@@ -68,6 +69,13 @@
         // Zmienne dla kolorów mgły
         let fogColor = '#808080';
         let fogOpacity = 0.65;
+
+        // Zmienne dla postaci
+        const charactersLayer = document.getElementById('charactersLayer');
+        const charactersCtx = charactersLayer.getContext('2d');
+        let characters = { players: [], enemies: [] };
+        let playerColor = '#00ff00';
+        let enemyColor = '#ff0000';
 
         // Zmienne dla viewportu i zoom
         let zoom = 1;
@@ -280,9 +288,74 @@
                         gridSize = data.gridSize;
                         gridOffsetX = Math.round(data.offsetX || 0);
                         gridOffsetY = Math.round(data.offsetY || 0);
+                        fetchCharacters(); // Pobierz postacie po załadowaniu siatki
                     }
                 })
                 .catch(() => { gridSize = null; });
+        }
+
+        // Funkcje obsługi postaci
+        function fetchCharacters() {
+            if (!previewMapName) return;
+
+            // Pobierz postacie z localStorage (przez endpoint)
+            fetch(`/api/characters/${previewMapName}`)
+                .then(res => res.ok ? res.json() : null)
+                .then(data => {
+                    if (data) {
+                        characters = data.characters || { players: [], enemies: [] };
+                        playerColor = data.playerColor || '#00ff00';
+                        enemyColor = data.enemyColor || '#ff0000';
+                        drawCharacters();
+                    }
+                })
+                .catch(err => console.error('Error fetching characters:', err));
+        }
+
+        function drawCharacters() {
+            if (!mapImage.complete || !gridSize) return;
+
+            // Ustaw rozmiar canvas
+            charactersLayer.width = mapImage.naturalWidth;
+            charactersLayer.height = mapImage.naturalHeight;
+
+            // Wyczyść canvas
+            charactersCtx.clearRect(0, 0, charactersLayer.width, charactersLayer.height);
+
+            // Rysuj graczy (okręgi)
+            charactersCtx.strokeStyle = playerColor;
+            charactersCtx.fillStyle = playerColor + '40'; // 25% opacity
+            charactersCtx.lineWidth = 3;
+
+            characters.players.forEach(player => {
+                const centerX = player.x + gridSize / 2;
+                const centerY = player.y + gridSize / 2;
+                const radius = gridSize / 2 - 5;
+
+                charactersCtx.beginPath();
+                charactersCtx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                charactersCtx.fill();
+                charactersCtx.stroke();
+            });
+
+            // Rysuj wrogów (litery)
+            charactersCtx.fillStyle = enemyColor;
+            charactersCtx.font = `bold ${gridSize * 0.6}px Arial`;
+            charactersCtx.textAlign = 'center';
+            charactersCtx.textBaseline = 'middle';
+
+            characters.enemies.forEach(enemy => {
+                const centerX = enemy.x + gridSize / 2;
+                const centerY = enemy.y + gridSize / 2;
+
+                charactersCtx.fillText(enemy.letter, centerX, centerY);
+            });
+        }
+
+        function startPollingCharacters() {
+            setInterval(() => {
+                fetchCharacters();
+            }, 2000);
         }
 
 
@@ -411,6 +484,7 @@
                 pollRefreshRequest();
                 startFogAnimation();
                 pollNavigationCommands(); // Nasłuchuj poleceń nawigacji
+                startPollingCharacters(); // Nasłuchuj zmian w postaciach
                 setTimeout(reportViewport, 1000); // Wyślij początkowy viewport
             });
         };

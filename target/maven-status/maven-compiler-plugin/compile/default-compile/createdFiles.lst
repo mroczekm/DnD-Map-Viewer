@@ -1,4 +1,5 @@
 com\dnd\config\MapConfiguration$FogStates.class
+com\dnd\controller\CharactersController.class
 com\dnd\DnDApplication.class
 com\dnd\service\MapService.class
 com\dnd\service\GridService$GridConfig.class

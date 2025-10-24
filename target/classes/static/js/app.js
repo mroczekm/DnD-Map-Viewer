@@ -43,6 +43,16 @@ class DnDMapViewer {
         // Obrót mapy
         this.rotation = 0;
 
+        // Postacie
+        this.charactersCanvas = null;
+        this.charactersCtx = null;
+        this.characters = { players: [], enemies: [] };
+        this.characterMode = null; // 'player' lub 'enemy'
+        this.playerColor = '#00ff00';
+        this.enemyColor = '#ff0000';
+        this.draggingCharacter = null;
+        this.enemyLetterCounter = 0;
+
         // Wyczyść stare dane mgły z localStorage (nie są już używane)
         this.clearOldFogDataFromLocalStorage();
 
@@ -125,6 +135,21 @@ class DnDMapViewer {
         this.resetRotationBtn = document.getElementById('resetRotationBtn');
         this.rotationValue = document.getElementById('rotationValue');
 
+        // Elementy modułu postaci
+        this.charactersCanvas = document.getElementById('charactersCanvas');
+        if (this.charactersCanvas) {
+            this.charactersCtx = this.charactersCanvas.getContext('2d');
+        }
+        this.addPlayerBtn = document.getElementById('addPlayerBtn');
+        this.addEnemyBtn = document.getElementById('addEnemyBtn');
+        this.removeCharacterBtn = document.getElementById('removeCharacterBtn');
+        this.removeLastPlayerBtn = document.getElementById('removeLastPlayerBtn');
+        this.removeAllPlayersBtn = document.getElementById('removeAllPlayersBtn');
+        this.removeLastEnemyBtn = document.getElementById('removeLastEnemyBtn');
+        this.removeAllEnemiesBtn = document.getElementById('removeAllEnemiesBtn');
+        this.playerColorPicker = document.getElementById('playerColorPicker');
+        this.enemyColorPicker = document.getElementById('enemyColorPicker');
+
         // Nowe elementy dla bocznego panelu
         this.sidebar = document.getElementById('sidebar');
         this.sidebarToggle = document.getElementById('sidebarToggle');
@@ -196,7 +221,7 @@ class DnDMapViewer {
         });
         this.mapContainer.addEventListener('mousedown', e => this.onMouseDown(e));
         this.mapContainer.addEventListener('mousemove', e => this.onMouseMove(e));
-        this.mapContainer.addEventListener('mouseup', () => this.onMouseUp());
+        this.mapContainer.addEventListener('mouseup', e => this.onMouseUp(e));
         this.mapContainer.addEventListener('mouseleave', () => this.onMouseLeave());
         ['dragstart', 'selectstart', 'contextmenu'].forEach(ev =>
             this.mapContainer.addEventListener(ev, evn => evn.preventDefault())
@@ -255,6 +280,43 @@ class DnDMapViewer {
         }
         if(this.resetRotationBtn) {
             this.resetRotationBtn.addEventListener('click', () => this.resetRotation());
+        }
+
+        // Event listenery dla modułu postaci
+        if(this.addPlayerBtn) {
+            this.addPlayerBtn.addEventListener('click', () => this.toggleCharacterMode('player'));
+        }
+        if(this.addEnemyBtn) {
+            this.addEnemyBtn.addEventListener('click', () => this.toggleCharacterMode('enemy'));
+        }
+        if(this.removeCharacterBtn) {
+            this.removeCharacterBtn.addEventListener('click', () => this.toggleCharacterMode('remove'));
+        }
+        if(this.removeLastPlayerBtn) {
+            this.removeLastPlayerBtn.addEventListener('click', () => this.removeLastCharacter('player'));
+        }
+        if(this.removeAllPlayersBtn) {
+            this.removeAllPlayersBtn.addEventListener('click', () => this.removeAllCharacters('player'));
+        }
+        if(this.removeLastEnemyBtn) {
+            this.removeLastEnemyBtn.addEventListener('click', () => this.removeLastCharacter('enemy'));
+        }
+        if(this.removeAllEnemiesBtn) {
+            this.removeAllEnemiesBtn.addEventListener('click', () => this.removeAllCharacters('enemy'));
+        }
+        if(this.playerColorPicker) {
+            this.playerColorPicker.addEventListener('change', (e) => {
+                this.playerColor = e.target.value;
+                this.drawCharacters();
+                this.saveCharacters();
+            });
+        }
+        if(this.enemyColorPicker) {
+            this.enemyColorPicker.addEventListener('change', (e) => {
+                this.enemyColor = e.target.value;
+                this.drawCharacters();
+                this.saveCharacters();
+            });
         }
 
         // Obsługa bocznego panelu
@@ -316,6 +378,7 @@ class DnDMapViewer {
                 this.loadGridConfig();
                 this.resetZoom(); // Reset przed załadowaniem ustawień
                 this.loadMapSettings(); // Wczytaj zapisane ustawienia mapy - nadpisze reset
+                this.loadCharacters(); // Wczytaj postacie
 
                 // Rozpocznij synchronizację mgły
                 this.startFogSynchronization();
@@ -395,16 +458,22 @@ class DnDMapViewer {
     }
 
     setupCanvases(){
-        [this.fogCanvas, this.gridCanvas, this.calibrationCanvas].forEach(c => {
-            c.width = this.currentMap.width;
-            c.height = this.currentMap.height;
-            c.style.width = this.currentMap.width + 'px';
-            c.style.height = this.currentMap.height + 'px';
+        [this.fogCanvas, this.gridCanvas, this.calibrationCanvas, this.charactersCanvas, this.previewViewportCanvas].forEach(c => {
+            if (c) {
+                c.width = this.currentMap.width;
+                c.height = this.currentMap.height;
+                c.style.width = this.currentMap.width + 'px';
+                c.style.height = this.currentMap.height + 'px';
+            }
         });
+        // Narysuj początkową mgłę jako kwadrat bez zaokrągleń
+        this.fogCtx.globalCompositeOperation = 'source-over';
         this.fogCtx.fillStyle = 'rgba(128,128,128,0.65)';
         this.fogCtx.fillRect(0, 0, this.currentMap.width, this.currentMap.height);
-        this.fogCtx.globalCompositeOperation = 'destination-out';
         this.calibrationCanvas.classList.remove('hidden');
+
+        // Setup canvas postaci
+        this.setupCharactersCanvas();
     }
 
     startGridCalibration(){
@@ -828,6 +897,12 @@ class DnDMapViewer {
             return;
         }
         
+        // Obsługa modułu postaci
+        if(this.characterMode) {
+            this.handleCharacterClick(e);
+            return;
+        }
+
         // Obsługa trybów malowania/usuwania mgły - TYLKO gdy przycisk jest aktywny
         if(this.isPaintingFog || this.isErasingFog) {
             this.lastPaintedCell = null; // Reset dla nowej sesji malowania
@@ -847,6 +922,12 @@ class DnDMapViewer {
             return;
         }
         
+        // Rozpocznij przeciąganie postaci z SHIFT
+        if(e.shiftKey && this.gridSize) {
+            this.handleCharacterDrag(e);
+            return;
+        }
+
         // WYŁĄCZONE: malowanie z Alt - teraz tylko przesuwanie mapy
         if(this.isAltPressed && this.gridSize){
             // this.isDrawing = true;
@@ -907,7 +988,13 @@ class DnDMapViewer {
         if(this.isPanning) this.handlePan(e);
     }
 
-    onMouseUp(){
+    onMouseUp(e){
+        // Obsługa drop postaci
+        if(this.draggingCharacter) {
+            this.handleCharacterDrop(e);
+            return;
+        }
+
         // WYŁĄCZONE: obsługa Alt dla odsłaniania
         // if(this.isDrawing){
         //     this.isDrawing = false;
@@ -1273,6 +1360,295 @@ class DnDMapViewer {
         }).catch(err => console.error('Error sending rotation command:', err));
     }
 
+    // ===== MODUŁ POSTACI =====
+
+    toggleCharacterMode(mode) {
+        if (this.characterMode === mode) {
+            // Wyłącz tryb
+            this.characterMode = null;
+            this.addPlayerBtn.classList.remove('active');
+            this.addEnemyBtn.classList.remove('active');
+            this.removeCharacterBtn.classList.remove('active');
+            this.updateCursor();
+        } else {
+            // Włącz tryb
+            this.characterMode = mode;
+            this.addPlayerBtn.classList.toggle('active', mode === 'player');
+            this.addEnemyBtn.classList.toggle('active', mode === 'enemy');
+            this.removeCharacterBtn.classList.toggle('active', mode === 'remove');
+            this.updateCursor();
+        }
+    }
+
+    handleCharacterClick(e) {
+        if (!this.characterMode || !this.gridSize) return;
+
+        const pos = this.getMousePos(e);
+        const cell = this.getGridCell(pos.x, pos.y);
+        if (!cell) return;
+
+        // Tryb usuwania
+        if (this.characterMode === 'remove') {
+            this.removeCharacterAtCell(cell.x, cell.y);
+            return;
+        }
+
+
+        // Sprawdź czy już jest postać w tej kratce
+        const existingIndex = this.findCharacterAtCell(cell.x, cell.y);
+        if (existingIndex !== -1) {
+            console.log('Na tym polu już jest postać');
+            return;
+        }
+
+        // Dodaj postać
+        if (this.characterMode === 'player') {
+            this.characters.players.push({ x: cell.x, y: cell.y });
+        } else if (this.characterMode === 'enemy') {
+            const letter = this.getNextEnemyLetter();
+            this.characters.enemies.push({ x: cell.x, y: cell.y, letter });
+        }
+
+        this.drawCharacters();
+        this.saveCharacters();
+    }
+
+    findCharacterAtCell(cellX, cellY) {
+        // Sprawdź graczy
+        const playerIndex = this.characters.players.findIndex(p => p.x === cellX && p.y === cellY);
+        if (playerIndex !== -1) return playerIndex;
+
+        // Sprawdź wrogów
+        const enemyIndex = this.characters.enemies.findIndex(e => e.x === cellX && e.y === cellY);
+        if (enemyIndex !== -1) return enemyIndex;
+
+        return -1;
+    }
+
+    getNextEnemyLetter() {
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const letter = alphabet[this.enemyLetterCounter % 26];
+        this.enemyLetterCounter++;
+        return letter;
+    }
+
+    removeCharacterAtCell(cellX, cellY) {
+        // Usuń gracza jeśli istnieje
+        const playerIndex = this.characters.players.findIndex(p => p.x === cellX && p.y === cellY);
+        if (playerIndex !== -1) {
+            this.characters.players.splice(playerIndex, 1);
+            this.drawCharacters();
+            this.saveCharacters();
+            return;
+        }
+
+        // Usuń wroga jeśli istnieje
+        const enemyIndex = this.characters.enemies.findIndex(e => e.x === cellX && e.y === cellY);
+        if (enemyIndex !== -1) {
+            this.characters.enemies.splice(enemyIndex, 1);
+            this.drawCharacters();
+            this.saveCharacters();
+            return;
+        }
+    }
+
+    handleCharacterDrag(e) {
+        const pos = this.getMousePos(e);
+        const cell = this.getGridCell(pos.x, pos.y);
+        if (!cell) return;
+
+        // Znajdź postać do przeciągnięcia
+        if (!this.draggingCharacter) {
+            // Szukaj postaci pod kursorem
+            const playerIndex = this.characters.players.findIndex(p => p.x === cell.x && p.y === cell.y);
+            if (playerIndex !== -1) {
+                this.draggingCharacter = { type: 'player', index: playerIndex };
+                return;
+            }
+
+            const enemyIndex = this.characters.enemies.findIndex(e => e.x === cell.x && e.y === cell.y);
+            if (enemyIndex !== -1) {
+                this.draggingCharacter = { type: 'enemy', index: enemyIndex };
+                return;
+            }
+        }
+    }
+
+    handleCharacterDrop(e) {
+        if (!this.draggingCharacter) return;
+
+        const pos = this.getMousePos(e);
+        const cell = this.getGridCell(pos.x, pos.y);
+        if (!cell) {
+            this.draggingCharacter = null;
+            return;
+        }
+
+        // Sprawdź czy cel jest wolny
+        const existingIndex = this.findCharacterAtCell(cell.x, cell.y);
+        if (existingIndex !== -1 &&
+            !(this.draggingCharacter.type === 'player' &&
+              this.characters.players[this.draggingCharacter.index].x === cell.x &&
+              this.characters.players[this.draggingCharacter.index].y === cell.y)) {
+            console.log('Cel jest zajęty');
+            this.draggingCharacter = null;
+            return;
+        }
+
+        // Przenieś postać
+        if (this.draggingCharacter.type === 'player') {
+            this.characters.players[this.draggingCharacter.index].x = cell.x;
+            this.characters.players[this.draggingCharacter.index].y = cell.y;
+        } else {
+            this.characters.enemies[this.draggingCharacter.index].x = cell.x;
+            this.characters.enemies[this.draggingCharacter.index].y = cell.y;
+        }
+
+        this.draggingCharacter = null;
+        this.drawCharacters();
+        this.saveCharacters();
+    }
+
+    removeLastCharacter(type) {
+        if (type === 'player') {
+            if (this.characters.players.length > 0) {
+                this.characters.players.pop();
+            }
+        } else if (type === 'enemy') {
+            if (this.characters.enemies.length > 0) {
+                this.characters.enemies.pop();
+                this.enemyLetterCounter--;
+            }
+        }
+        this.drawCharacters();
+        this.saveCharacters();
+    }
+
+    removeAllCharacters(type) {
+        if (type === 'player') {
+            this.characters.players = [];
+        } else if (type === 'enemy') {
+            this.characters.enemies = [];
+            this.enemyLetterCounter = 0;
+        }
+        this.drawCharacters();
+        this.saveCharacters();
+    }
+
+    drawCharacters() {
+        if (!this.charactersCanvas || !this.currentMap || !this.gridSize) return;
+
+        // Wyczyść canvas
+        this.charactersCtx.clearRect(0, 0, this.charactersCanvas.width, this.charactersCanvas.height);
+
+        // Rysuj graczy (okręgi)
+        this.charactersCtx.strokeStyle = this.playerColor;
+        this.charactersCtx.fillStyle = this.playerColor + '40'; // 25% opacity
+        this.charactersCtx.lineWidth = 3;
+
+        this.characters.players.forEach(player => {
+            const centerX = player.x + this.gridSize / 2;
+            const centerY = player.y + this.gridSize / 2;
+            const radius = this.gridSize / 2 - 5;
+
+            this.charactersCtx.beginPath();
+            this.charactersCtx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            this.charactersCtx.fill();
+            this.charactersCtx.stroke();
+        });
+
+        // Rysuj wrogów (litery)
+        this.charactersCtx.fillStyle = this.enemyColor;
+        this.charactersCtx.font = `bold ${this.gridSize * 0.6}px Arial`;
+        this.charactersCtx.textAlign = 'center';
+        this.charactersCtx.textBaseline = 'middle';
+
+        this.characters.enemies.forEach(enemy => {
+            const centerX = enemy.x + this.gridSize / 2;
+            const centerY = enemy.y + this.gridSize / 2;
+
+            this.charactersCtx.fillText(enemy.letter, centerX, centerY);
+        });
+    }
+
+    saveCharacters() {
+        if (!this.currentMap) return;
+
+        const data = {
+            characters: {
+                players: this.characters.players,
+                enemies: this.characters.enemies
+            },
+            enemyLetterCounter: this.enemyLetterCounter,
+            playerColor: this.playerColor,
+            enemyColor: this.enemyColor
+        };
+
+        // Zapisz lokalnie
+        localStorage.setItem(`characters_${this.currentMap.name}`, JSON.stringify(data));
+
+        // Wyślij na serwer dla synchronizacji z podglądem
+        fetch(`/api/characters/${this.currentMap.name}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }).catch(err => console.error('Error saving characters to server:', err));
+    }
+
+    async loadCharacters() {
+        if (!this.currentMap) return;
+
+        // Najpierw spróbuj z localStorage
+        const saved = localStorage.getItem(`characters_${this.currentMap.name}`);
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                this.applyCharactersData(data);
+                return;
+            } catch (e) {
+                console.error('Error loading characters from localStorage:', e);
+            }
+        }
+
+        // Jeśli nie ma w localStorage, pobierz z serwera
+        try {
+            const res = await fetch(`/api/characters/${this.currentMap.name}`);
+            if (res.ok) {
+                const data = await res.json();
+                this.applyCharactersData(data);
+            }
+        } catch (e) {
+            console.error('Error loading characters from server:', e);
+        }
+    }
+
+    applyCharactersData(data) {
+        this.characters.players = data.characters?.players || data.players || [];
+        this.characters.enemies = data.characters?.enemies || data.enemies || [];
+        this.enemyLetterCounter = data.enemyLetterCounter || 0;
+
+        if (data.playerColor) {
+            this.playerColor = data.playerColor;
+            if (this.playerColorPicker) this.playerColorPicker.value = data.playerColor;
+        }
+
+        if (data.enemyColor) {
+            this.enemyColor = data.enemyColor;
+            if (this.enemyColorPicker) this.enemyColorPicker.value = data.enemyColor;
+        }
+
+        this.drawCharacters();
+    }
+
+    setupCharactersCanvas() {
+        if (!this.charactersCanvas || !this.currentMap) return;
+
+        this.charactersCanvas.width = this.currentMap.width;
+        this.charactersCanvas.height = this.currentMap.height;
+        this.charactersCanvas.classList.remove('hidden');
+    }
+
+    // ===== KONIEC MODUŁU POSTACI =====
 
     // Metody zapisywania i wczytywania ustawień mapy
     saveMapSettings() {
