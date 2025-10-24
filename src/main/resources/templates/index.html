@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DnD Map Viewer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Left Sidebar Panel -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2 class="mdc-typography--headline6">DnD Map Viewer</h2>
+                <button id="sidebarToggle" class="toggle-btn">
+                    <i class="material-icons">chevron_left</i>
+                </button>
+            </div>
+
+            <div class="sidebar-content">
+                <!-- Map Selection Section -->
+                <div class="control-section">
+                    <div class="section-toggle" data-target="map-selection">
+                        <i class="material-icons">map</i>
+                        <span>Wybór mapy</span>
+                        <i class="material-icons toggle-icon">expand_less</i>
+                    </div>
+                    <div class="section-content expanded" id="map-selection">
+                        <div class="map-select-wrapper">
+                            <select id="mapSelect" class="map-select">
+                                <option value="">-- Wybierz mapę --</option>
+                                <option th:each="map : ${maps}" th:value="${map.name}" th:text="${map.name}"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fog Management Section -->
+                <div class="control-section">
+                    <div class="section-toggle" data-target="fog-management">
+                        <i class="material-icons">cloud</i>
+                        <span>Zarządzanie mgłą</span>
+                        <i class="material-icons toggle-icon">expand_less</i>
+                    </div>
+                    <div class="section-content expanded" id="fog-management">
+                        <div class="fog-controls">
+                            <button id="paintFogBtn" class="mdc-button mdc-button--outlined fog-btn">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">brush</i>
+                                <span class="mdc-button__label">Maluj mgłę</span>
+                            </button>
+                            <button id="eraseFogBtn" class="mdc-button mdc-button--outlined fog-btn">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">cleaning_services</i>
+                                <span class="mdc-button__label">Usuń mgłę</span>
+                            </button>
+                            <button id="resetFogBtn" class="mdc-button mdc-button--outlined fog-btn fog-btn--danger">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">restart_alt</i>
+                                <span class="mdc-button__label">Reset mgły</span>
+                            </button>
+                        </div>
+
+                        <div class="grid-area-control">
+                            <label for="gridAreaSize">Obszar kratek:</label>
+                            <select id="gridAreaSize" class="grid-area-select">
+                                <option value="1">1x1</option>
+                                <option value="2">2x2</option>
+                                <option value="3" selected>3x3</option>
+                                <option value="4">4x4</option>
+                                <option value="5">5x5</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- View Section -->
+                <div class="control-section">
+                    <div class="section-toggle" data-target="view-settings">
+                        <i class="material-icons">visibility</i>
+                        <span>Widok</span>
+                        <i class="material-icons toggle-icon">expand_more</i>
+                    </div>
+                    <div class="section-content" id="view-settings">
+                        <div class="view-controls">
+                            <button id="toggleGridBtn" class="mdc-button mdc-button--outlined">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">grid_on</i>
+                                <span class="mdc-button__label">Pokaż/Ukryj siatka</span>
+                            </button>
+                        </div>
+
+                        <div class="grid-color-controls">
+                            <div class="color-control">
+                                <label for="gridColorPicker">Kolor siatki:</label>
+                                <input type="color" id="gridColorPicker" value="#ffffff" class="color-picker">
+                            </div>
+                        </div>
+
+                        <div class="fog-color-controls">
+                            <div class="color-control">
+                                <label for="fogColorPickerView">Kolor mgły:</label>
+                                <input type="color" id="fogColorPickerView" value="#808080" class="color-picker">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid Calibration Section -->
+                <div class="control-section">
+                    <div class="section-toggle" data-target="grid-calibration">
+                        <i class="material-icons">grid_on</i>
+                        <span>Kalibracja siatki</span>
+                        <i class="material-icons toggle-icon">expand_more</i>
+                    </div>
+                    <div class="section-content" id="grid-calibration">
+                        <div class="status-chip">
+                            <span id="gridStatus" class="mdc-typography--caption">Siatka: niekalibrowana</span>
+                        </div>
+
+                        <div class="calibration-actions">
+                            <button id="calibrateGridBtn" class="mdc-button mdc-button--outlined">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">grid_on</i>
+                                <span class="mdc-button__label">Kalibruj</span>
+                            </button>
+                        </div>
+
+                        <div class="grid-manual">
+                            <div class="manual-inputs">
+                                <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense">
+                                    <span class="mdc-notched-outline">
+                                        <span class="mdc-notched-outline__leading"></span>
+                                        <span class="mdc-notched-outline__notch">
+                                            <span class="mdc-floating-label">Rozmiar</span>
+                                        </span>
+                                        <span class="mdc-notched-outline__trailing"></span>
+                                    </span>
+                                    <input type="number" id="gridSizeInput" min="1" class="mdc-text-field__input" />
+                                </label>
+                                <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense">
+                                    <span class="mdc-notched-outline">
+                                        <span class="mdc-notched-outline__leading"></span>
+                                        <span class="mdc-notched-outline__notch">
+                                            <span class="mdc-floating-label">Offset X</span>
+                                        </span>
+                                        <span class="mdc-notched-outline__trailing"></span>
+                                    </span>
+                                    <input type="number" id="gridOffsetXInput" class="mdc-text-field__input" />
+                                </label>
+                                <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense">
+                                    <span class="mdc-notched-outline">
+                                        <span class="mdc-notched-outline__leading"></span>
+                                        <span class="mdc-notched-outline__notch">
+                                            <span class="mdc-floating-label">Offset Y</span>
+                                        </span>
+                                        <span class="mdc-notched-outline__trailing"></span>
+                                    </span>
+                                    <input type="number" id="gridOffsetYInput" class="mdc-text-field__input" />
+                                </label>
+                            </div>
+                            <div class="manual-actions">
+                                <button id="saveGridBtn" class="mdc-button mdc-button--raised">
+                                    <span class="mdc-button__ripple"></span>
+                                    <i class="material-icons mdc-button__icon">save</i>
+                                    <span class="mdc-button__label">Zapisz</span>
+                                </button>
+                                <button id="clearGridBtn" class="mdc-button mdc-button--outlined manual-btn--danger">
+                                    <span class="mdc-button__ripple"></span>
+                                    <i class="material-icons mdc-button__icon">delete</i>
+                                    <span class="mdc-button__label">Usuń</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Control at Bottom -->
+            <div class="sidebar-footer">
+                <button id="setPreviewMapBtn" class="mdc-button mdc-button--outlined footer-btn">
+                    <span class="mdc-button__ripple"></span>
+                    <i class="material-icons mdc-button__icon">visibility</i>
+                    <span class="mdc-button__label">Ustaw podgląd</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="map-container" id="mapContainer">
+                <div class="left-controls">
+                    <div class="navigation-controls">
+                        <div class="nav-row"><button id="navUpBtn" class="nav-btn" title="Góra">▲</button></div>
+                        <div class="nav-row">
+                            <button id="navLeftBtn" class="nav-btn" title="Lewo">◀</button>
+                            <button id="navCenterBtn" class="nav-btn" title="Wycentruj">⚫</button>
+                            <button id="navRightBtn" class="nav-btn" title="Prawo">▶</button>
+                        </div>
+                        <div class="nav-row"><button id="navDownBtn" class="nav-btn" title="Dół">▼</button></div>
+                    </div>
+                    <div class="zoom-controls">
+                        <button id="zoomInBtn" class="zoom-btn" title="Powiększ">+</button>
+                        <div id="zoomLevel" class="zoom-level">100%</div>
+                        <button id="zoomOutBtn" class="zoom-btn" title="Pomniejsz">-</button>
+                        <button id="resetZoomBtn" class="zoom-btn" title="Reset zoom">↻</button>
+                    </div>
+                </div>
+                <div class="map-wrapper" id="mapWrapper">
+                    <img id="mapImage" class="map-image hidden" alt="Mapa DnD">
+                    <canvas id="gridCanvas" class="fog-layer hidden" style="z-index:5;"></canvas>
+                    <canvas id="fogCanvas" class="fog-layer hidden"></canvas>
+                    <canvas id="calibrationCanvas" class="fog-layer hidden"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>

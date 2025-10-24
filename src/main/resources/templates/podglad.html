@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DnD Map Podgląd</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #1a1a1a; color: #fff; }
+        .header { background-color: #2c2c2c; padding: 10px 20px; border-bottom: 2px solid #444; }
+        .map-container { position: relative; overflow: auto; height: calc(100vh - 60px); background-color: #000; }
+        .map-wrapper { position: relative; display: inline-block; transform-origin: 0 0; }
+        .map-image { display: block; max-width: none; position: relative; user-select: none; }
+        .fog-layer { position: absolute; top: 0; left: 0; z-index: 10; user-select: none; }
+    </style>
+</head>
+<body>
+    <div class="map-container">
+        <div class="map-wrapper">
+            <img id="mapImage" class="map-image" th:src="@{/api/maps/{mapName}(mapName=${mapName})}" alt="Mapa" />
+            <canvas id="fogLayer" class="fog-layer"></canvas>
+        </div>
+    </div>
+    <script>
+        const mapImage = document.getElementById('mapImage');
+        const fogLayer = document.getElementById('fogLayer');
+        let fogState = null;
+        let mapInfo = null;
+        let pollingInterval = null;
+        let previewMapName = null;
+        let animationFrame = null;
+        let animationTime = 0;
+
+        // Dodaj zmienne dla siatki
+        let gridSize = null;
+        let gridOffsetX = 0;
+        let gridOffsetY = 0;
+        let isDragging = false;
+        let lastRevealedCells = new Set();
+
+        // Zmienne dla kolorów mgły
+        let fogColor = '#808080';
+        let fogOpacity = 0.65;
+
+        function fetchPreviewMapName() {
+            return fetch('/api/preview-map')
+                .then(res => res.ok ? res.text() : null)
+                .then(name => {
+                    previewMapName = name;
+                    return name;
+                });
+        }
+
+        function fetchMapInfo() {
+            if (!previewMapName) return;
+            fetch(`/api/maps/${previewMapName}`)
+                .then(res => res.json())
+                .then(data => {
+                    mapInfo = data;
+                    mapImage.src = `/api/map-files/${mapInfo.filename}`;
+                    mapImage.onload = () => {
+                        renderFog();
+                    };
+                });
+        }
+
+        function fetchFogState() {
+            if (!previewMapName) return;
+            fetch(`/api/fog/${previewMapName}`)
+                .then(res => res.json())
+                .then(data => {
+                    fogState = data;
+                    renderFog();
+                });
+        }
+
+        function startPollingFog() {
+            if (pollingInterval) clearInterval(pollingInterval);
+            pollingInterval = setInterval(fetchFogState, 2000);
+        }
+
+        // Funkcje obsługi siatki
+        function fetchGridConfig() {
+            if (!previewMapName) return;
+            fetch(`/api/grid/${previewMapName}`)
+                .then(res => res.ok ? res.json() : null)
+                .then(data => {
+                    if (data && data.gridSize) {
+                        gridSize = data.gridSize;
+                        gridOffsetX = Math.round(data.offsetX || 0);
+                        gridOffsetY = Math.round(data.offsetY || 0);
+                    }
+                })
+                .catch(() => { gridSize = null; });
+        }
+
+        function getMousePos(e) {
+            const rect = fogLayer.getBoundingClientRect();
+            const scaleX = fogLayer.width / rect.width;
+            const scaleY = fogLayer.height / rect.height;
+            return {
+                x: (e.clientX - rect.left) * scaleX,
+                y: (e.clientY - rect.top) * scaleY
+            };
+        }
+
+        function getGridCell(x, y) {
+            if (!gridSize) return null;
+            const adjustedX = x - gridOffsetX;
+            const adjustedY = y - gridOffsetY;
+            const cellX = Math.floor(adjustedX / gridSize) * gridSize + gridOffsetX;
+            const cellY = Math.floor(adjustedY / gridSize) * gridSize + gridOffsetY;
+            return { x: cellX, y: cellY };
+        }
+
+        function revealGridCell(cellX, cellY) {
+            const cellKey = `${cellX},${cellY}`;
+            if (lastRevealedCells.has(cellKey)) return;
+
+            lastRevealedCells.add(cellKey);
+
+            // Wyślij żądanie odsłonięcia kratki
+            fetch(`/api/fog/${previewMapName}/reveal-cell`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    x: cellX + gridSize/2,
+                    y: cellY + gridSize/2,
+                    radius: gridSize/2,
+                    isGridCell: true
+                })
+            });
+        }
+
+        // Obsługa myszy
+        fogLayer.addEventListener('mousedown', (e) => {
+            if (e.button === 0) {
+                isDragging = true;
+                lastRevealedCells.clear();
+                handleReveal(e);
+            }
+        });
+
+        fogLayer.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                handleReveal(e);
+            }
+        });
+
+        fogLayer.addEventListener('mouseup', () => {
+            isDragging = false;
+            lastRevealedCells.clear();
+        });
+
+        fogLayer.addEventListener('mouseleave', () => {
+            isDragging = false;
+            lastRevealedCells.clear();
+        });
+
+        function handleReveal(e) {
+            const pos = getMousePos(e);
+
+            if (gridSize) {
+                // Tryb siatki - odsłoń całą kratkę
+                const cell = getGridCell(pos.x, pos.y);
+                if (cell) {
+                    revealGridCell(cell.x, cell.y);
+                }
+            } else {
+                // Tryb klasyczny - odsłoń okrągły obszar
+                fetch(`/api/fog/${previewMapName}/reveal-point`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        x: pos.x,
+                        y: pos.y,
+                        radius: 30
+                    })
+                });
+            }
+        }
+
+        // Prostszy i szybszy szum
+        function fastNoise(x, y, seed = 0) {
+            const n = Math.sin(x * 0.1 + y * 0.13 + seed) *
+                     Math.cos(x * 0.07 + y * 0.11 + seed * 0.5);
+            return (n + 1) * 0.5; // normalizuj do 0-1
+        }
+
+        function drawFogBackground(ctx, width, height, time = 0) {
+            const imageData = ctx.createImageData(width, height);
+
+            // Bardziej dynamiczny ruch mgły
+            const step = 4;
+            const windTime = time * 0.005; // zwiększona prędkość 5x
+
+            for (let y = 0; y < height; y += step) {
+                for (let x = 0; x < width; x += step) {
+                    // Większe przesunięcia dla wyraźnej animacji
+                    const nx = x * 0.008 + windTime;
+                    const ny = y * 0.008 + windTime * 0.6;
+
+                    // Dodatkowe przesunięcia w różnych kierunkach
+                    const offsetX = Math.sin(windTime * 0.3) * 50;
+                    const offsetY = Math.cos(windTime * 0.2) * 30;
+
+                    // Bardziej dynamiczne warstwy
+                    const cloud1 = fastNoise(nx + offsetX * 0.01, ny + offsetY * 0.01, windTime);
+                    const cloud2 = fastNoise((nx + offsetX * 0.01) * 1.5, (ny + offsetY * 0.01) * 1.5, windTime + 100);
+
+                    // Dodatkowa warstwa z szybkim ruchem
+                    const quickCloud = Math.sin(nx * 3 + windTime * 2) * Math.cos(ny * 3 + windTime * 1.5) * 0.2;
+
+                    const cloudDensity = (cloud1 * 0.5 + cloud2 * 0.3 + quickCloud + 0.5);
+                    const grayValue = Math.floor(60 + cloudDensity * 70);
+                    const clampedGray = Math.max(50, Math.min(130, grayValue));
+
+                    // Wypełnij blok 4x4 tym samym kolorem
+                    for (let dy = 0; dy < step && y + dy < height; dy++) {
+                        for (let dx = 0; dx < step && x + dx < width; dx++) {
+                            const idx = ((y + dy) * width + (x + dx)) * 4;
+                            imageData.data[idx] = clampedGray;
+                            imageData.data[idx + 1] = clampedGray;
+                            imageData.data[idx + 2] = clampedGray;
+                            imageData.data[idx + 3] = 255;
+                        }
+                    }
+                }
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        function renderFog() {
+            if (!fogState || !mapImage.complete) return;
+            fogLayer.width = mapImage.naturalWidth;
+            fogLayer.height = mapImage.naturalHeight;
+            fogLayer.style.width = mapImage.width + 'px';
+            fogLayer.style.height = mapImage.height + 'px';
+            const ctx = fogLayer.getContext('2d');
+            ctx.clearRect(0, 0, fogLayer.width, fogLayer.height);
+            drawFogBackground(ctx, fogLayer.width, fogLayer.height, animationTime);
+            if (fogState && fogState.revealedAreas) {
+                ctx.save();
+                ctx.globalCompositeOperation = 'destination-out';
+                fogState.revealedAreas.forEach(area => {
+                    const looksLikeGridCell = gridSize && Math.abs(area.radius - gridSize / 2) < 0.01;
+                    if (area.isGridCell || looksLikeGridCell) {
+                        ctx.fillStyle = 'rgba(255,255,255,1)';
+                        const cellX = area.x - area.radius;
+                        const cellY = area.y - area.radius;
+                        ctx.fillRect(cellX, cellY, area.radius * 2, area.radius * 2);
+                    } else {
+                        const gradient = ctx.createRadialGradient(area.x, area.y, area.radius * 0.5, area.x, area.y, area.radius);
+                        gradient.addColorStop(0, 'rgba(255,255,255,1)');
+                        gradient.addColorStop(1, 'rgba(255,255,255,0)');
+                        ctx.beginPath();
+                        ctx.arc(area.x, area.y, area.radius, 0, 2 * Math.PI);
+                        ctx.closePath();
+                        ctx.fillStyle = gradient;
+                        ctx.fill();
+                    }
+                });
+                ctx.restore();
+            }
+        }
+
+        function pollRefreshRequest() {
+            setInterval(() => {
+                fetch('/api/preview-map/refresh')
+                    .then(res => res.json())
+                    .then(refresh => {
+                        if (refresh) {
+                            window.location.reload();
+                        }
+                    });
+            }, 2000);
+        }
+
+        function animateFog() {
+            animationTime += 50; // znacznie zwiększona prędkość
+            console.log('Animating fog, time:', animationTime); // debug log
+            renderFog();
+            animationFrame = requestAnimationFrame(animateFog);
+        }
+
+        function startFogAnimation() {
+            if (animationFrame) cancelAnimationFrame(animationFrame);
+            animateFog();
+        }
+
+        function stopFogAnimation() {
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
+            }
+        }
+
+        window.onload = function() {
+            fetchPreviewMapName().then(() => {
+                fetchMapInfo();
+                fetchGridConfig(); // Pobierz konfigurację siatki
+                fetchFogState();
+                startPollingFog();
+                pollRefreshRequest();
+                startFogAnimation();
+            });
+        };
+    </script>
+</body>
+</html>
