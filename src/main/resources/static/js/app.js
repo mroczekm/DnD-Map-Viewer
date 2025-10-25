@@ -57,6 +57,7 @@ class DnDMapViewer {
         this.enemyColor = '#ff0000';
         this.draggingCharacter = null;
         this.enemyLetterCounter = 0;
+        this.isShiftPressed = false; // Śledzenie klawisza Shift
 
         // Wyczyść stare dane mgły z localStorage (nie są już używane)
         this.clearOldFogDataFromLocalStorage();
@@ -129,6 +130,8 @@ class DnDMapViewer {
 
         // Dodatkowe kontrolki koloru mgły w sekcji widok
         this.fogColorPickerView = document.getElementById('fogColorPickerView');
+        this.fogOpacitySlider = document.getElementById('fogOpacitySlider');
+        this.fogOpacityValue = document.getElementById('fogOpacityValue');
 
         // Canvas dla viewportu podglądu
         this.previewViewportCanvas = document.getElementById('previewViewportCanvas');
@@ -234,12 +237,23 @@ class DnDMapViewer {
                 this.isAltPressed = true;
                 this.updateCursor();
             }
+            if(e.key === 'Shift'){
+                console.log('🔵 Shift WCIŚNIĘTY');
+                this.isShiftPressed = true;
+                this.updateCursor();
+            }
         });
         document.addEventListener('keyup', e => {
             if(e.key === 'Alt'){
                 this.isAltPressed = false;
                 this.updateCursor();
                 this.clearHighlight();
+            }
+            if(e.key === 'Shift'){
+                console.log('🔴 Shift PUSZCZONY');
+                this.isShiftPressed = false;
+                this.draggingCharacter = null;
+                this.updateCursor();
             }
         });
         this.mapContainer.addEventListener('mousedown', e => this.onMouseDown(e));
@@ -313,6 +327,18 @@ class DnDMapViewer {
         // Event listenery dla kontrolek koloru mgły w sekcji widok
         if(this.fogColorPickerView) {
             this.fogColorPickerView.addEventListener('change', () => this.updateFogColorFromView());
+        }
+
+        if(this.fogOpacitySlider) {
+            this.fogOpacitySlider.addEventListener('input', (e) => {
+                const opacity = e.target.value;
+                this.fogOpacity = opacity / 100; // Konwersja z 0-100 na 0-1
+                if(this.fogOpacityValue) {
+                    this.fogOpacityValue.textContent = `${opacity}%`;
+                }
+                this.renderFog(); // Przerysuj mgłę z nową przezroczystością
+                this.saveMapSettings(); // Zapisz ustawienia
+            });
         }
 
         // Event listenery dla kontrolek kolorów siatki
@@ -1227,13 +1253,30 @@ class DnDMapViewer {
 
     onMouseDown(e){
         if(e.button !== 0) return;
+
+        console.log('🖱️ onMouseDown:', {
+            isShift: this.isShiftPressed,
+            characterMode: this.characterMode,
+            gridSize: this.gridSize,
+            isPaintingFog: this.isPaintingFog,
+            isErasingFog: this.isErasingFog
+        });
+
         if(this.isCalibrating){
             this.handleCalibrationClick(e);
             return;
         }
         
-        // Obsługa modułu postaci
+        // SHIFT + klik = przesuwanie postaci (zawsze gdy jest siatka)
+        if(this.isShiftPressed && this.gridSize) {
+            console.log('✅ Wywołuję handleCharacterClick dla Shift');
+            this.handleCharacterClick(e);
+            return;
+        }
+
+        // Obsługa modułu postaci (dodawanie/usuwanie)
         if(this.characterMode) {
+            console.log('✅ Wywołuję handleCharacterClick dla characterMode');
             this.handleCharacterClick(e);
             return;
         }
@@ -1254,12 +1297,6 @@ class DnDMapViewer {
                     this.lastPaintedCell = `${cell.x},${cell.y}`;
                 }
             }
-            return;
-        }
-        
-        // Rozpocznij przeciąganie postaci z SHIFT
-        if(e.shiftKey && this.gridSize) {
-            this.handleCharacterDrag(e);
             return;
         }
 
@@ -1404,6 +1441,11 @@ class DnDMapViewer {
     updateCursor(){
         if(this.isCalibrating){
             this.mapContainer.style.cursor = 'crosshair';
+            return;
+        }
+        if(this.isShiftPressed && this.gridSize){
+            // Kursor przesuwania postaci
+            this.mapContainer.style.cursor = this.draggingCharacter ? 'grabbing' : 'grab';
             return;
         }
         if(this.isAltPressed && this.gridSize){
@@ -1735,11 +1777,44 @@ class DnDMapViewer {
     }
 
     handleCharacterClick(e) {
-        if (!this.characterMode || !this.gridSize) return;
+        if (!this.gridSize) {
+            console.log('❌ Brak siatki, przesuwanie niemożliwe');
+            return;
+        }
 
         const pos = this.getMousePos(e);
         const cell = this.getGridCell(pos.x, pos.y);
-        if (!cell) return;
+        if (!cell) {
+            console.log('❌ Nie można uzyskać komórki siatki');
+            return;
+        }
+
+        console.log('✅ handleCharacterClick:', {
+            isShift: this.isShiftPressed,
+            characterMode: this.characterMode,
+            cell,
+            draggingCharacter: this.draggingCharacter
+        });
+
+        // Shift+klik = podnieś postać (upuść w onMouseUp)
+        if (this.isShiftPressed) {
+            console.log('🔵 SHIFT AKTYWNY - tryb przesuwania');
+
+            // Podnieś postać z tej kratki
+            const charAtCell = this.findCharacterAtCell(cell.x, cell.y);
+            if (charAtCell) {
+                console.log('🎯 Podniesiono postać:', charAtCell);
+                this.draggingCharacter = charAtCell;
+                this.updateCursor();
+            } else {
+                console.log('❌ Brak postaci na tej kratce');
+            }
+            return; // Ważne - nie przechodzimy dalej
+        }
+
+        // Normalne tryby (dodawanie/usuwanie) - tylko gdy NIE ma Shift
+        console.log('🔷 Tryb normalny (nie Shift), characterMode:', this.characterMode);
+        if (!this.characterMode) return;
 
         // Tryb usuwania
         if (this.characterMode === 'remove') {
@@ -1747,10 +1822,9 @@ class DnDMapViewer {
             return;
         }
 
-
         // Sprawdź czy już jest postać w tej kratce
         const existingIndex = this.findCharacterAtCell(cell.x, cell.y);
-        if (existingIndex !== -1) {
+        if (existingIndex) {
             console.log('Na tym polu już jest postać');
             return;
         }
@@ -1768,15 +1842,61 @@ class DnDMapViewer {
     }
 
     findCharacterAtCell(cellX, cellY) {
+        console.log('🔍 findCharacterAtCell szuka w:', { cellX, cellY });
+        console.log('📊 Dostępni gracze:', this.characters.players);
+        console.log('📊 Dostępni wrogowie:', this.characters.enemies);
+
+        const tolerance = this.gridSize ? this.gridSize / 2 : 10; // Tolerancja na zaokrąglenia
+
         // Sprawdź graczy
-        const playerIndex = this.characters.players.findIndex(p => p.x === cellX && p.y === cellY);
-        if (playerIndex !== -1) return playerIndex;
+        const playerIndex = this.characters.players.findIndex((p, idx) => {
+            // Sprawdź czy postać jest w tej samej kratce (z tolerancją)
+            const match = Math.abs(p.x - cellX) < tolerance && Math.abs(p.y - cellY) < tolerance;
+            console.log(`  Gracz[${idx}]: x=${p.x}, y=${p.y}, różnicaX=${Math.abs(p.x - cellX).toFixed(2)}, różnicaY=${Math.abs(p.y - cellY).toFixed(2)}, dopasowanie=${match}`);
+            return match;
+        });
+        if (playerIndex !== -1) {
+            console.log('✅ Znaleziono gracza na indeksie:', playerIndex);
+            return { type: 'player', index: playerIndex };
+        }
 
         // Sprawdź wrogów
-        const enemyIndex = this.characters.enemies.findIndex(e => e.x === cellX && e.y === cellY);
-        if (enemyIndex !== -1) return enemyIndex;
+        const enemyIndex = this.characters.enemies.findIndex((e, idx) => {
+            const match = Math.abs(e.x - cellX) < tolerance && Math.abs(e.y - cellY) < tolerance;
+            console.log(`  Wróg[${idx}]: x=${e.x}, y=${e.y}, letter=${e.letter}, różnicaX=${Math.abs(e.x - cellX).toFixed(2)}, różnicaY=${Math.abs(e.y - cellY).toFixed(2)}, dopasowanie=${match}`);
+            return match;
+        });
+        if (enemyIndex !== -1) {
+            console.log('✅ Znaleziono wroga na indeksie:', enemyIndex);
+            return { type: 'enemy', index: enemyIndex };
+        }
 
-        return -1;
+        console.log('❌ Nie znaleziono żadnej postaci na tej kratce');
+        return null;
+    }
+
+    moveCharacterToCell(character, newCellX, newCellY) {
+        console.log('📍 moveCharacterToCell:', { character, newCellX, newCellY });
+
+        // Sprawdź czy docelowa kratka jest pusta (ignoruj tę samą postać!)
+        const existingChar = this.findCharacterAtCell(newCellX, newCellY);
+        if (existingChar && !(existingChar.type === character.type && existingChar.index === character.index)) {
+            console.log('❌ Docelowa kratka jest zajęta przez inną postać:', existingChar);
+            return;
+        }
+
+        // Przenieś postać
+        if (character.type === 'player') {
+            this.characters.players[character.index].x = newCellX;
+            this.characters.players[character.index].y = newCellY;
+        } else if (character.type === 'enemy') {
+            this.characters.enemies[character.index].x = newCellX;
+            this.characters.enemies[character.index].y = newCellY;
+        }
+
+        console.log(`✅ Przeniesiono postać ${character.type} na (${newCellX}, ${newCellY})`);
+        this.drawCharacters();
+        this.saveCharacters();
     }
 
     getNextEnemyLetter() {
@@ -1829,7 +1949,10 @@ class DnDMapViewer {
     }
 
     handleCharacterDrop(e) {
-        if (!this.draggingCharacter) return;
+        if (!this.draggingCharacter || !this.gridSize) {
+            this.draggingCharacter = null;
+            return;
+        }
 
         const pos = this.getMousePos(e);
         const cell = this.getGridCell(pos.x, pos.y);
@@ -1838,29 +1961,12 @@ class DnDMapViewer {
             return;
         }
 
-        // Sprawdź czy cel jest wolny
-        const existingIndex = this.findCharacterAtCell(cell.x, cell.y);
-        if (existingIndex !== -1 &&
-            !(this.draggingCharacter.type === 'player' &&
-              this.characters.players[this.draggingCharacter.index].x === cell.x &&
-              this.characters.players[this.draggingCharacter.index].y === cell.y)) {
-            console.log('Cel jest zajęty');
-            this.draggingCharacter = null;
-            return;
-        }
+        console.log('📍 handleCharacterDrop - upuszczam na:', cell);
 
-        // Przenieś postać
-        if (this.draggingCharacter.type === 'player') {
-            this.characters.players[this.draggingCharacter.index].x = cell.x;
-            this.characters.players[this.draggingCharacter.index].y = cell.y;
-        } else {
-            this.characters.enemies[this.draggingCharacter.index].x = cell.x;
-            this.characters.enemies[this.draggingCharacter.index].y = cell.y;
-        }
-
+        // Przenieś postać używając moveCharacterToCell (ma już całą logikę)
+        this.moveCharacterToCell(this.draggingCharacter, cell.x, cell.y);
         this.draggingCharacter = null;
-        this.drawCharacters();
-        this.saveCharacters();
+        this.updateCursor();
     }
 
     removeLastCharacter(type) {
@@ -2014,6 +2120,7 @@ class DnDMapViewer {
             panOffset: this.panOffset,
             gridColor: this.gridColor,
             fogColor: this.fogColor,
+            fogOpacity: this.fogOpacity,
             previewViewportColor: this.previewViewportColor,
             previewViewportVisible: this.previewViewportVisible,
             gridVisible: this.gridVisible
@@ -2059,6 +2166,16 @@ class DnDMapViewer {
                 this.fogColor = settings.fogColor;
                 if (this.fogColorPickerView) {
                     this.fogColorPickerView.value = settings.fogColor;
+                }
+            }
+
+            if (settings.fogOpacity !== undefined) {
+                this.fogOpacity = settings.fogOpacity;
+                if (this.fogOpacitySlider) {
+                    this.fogOpacitySlider.value = Math.round(settings.fogOpacity * 100);
+                }
+                if (this.fogOpacityValue) {
+                    this.fogOpacityValue.textContent = `${Math.round(settings.fogOpacity * 100)}%`;
                 }
             }
 
