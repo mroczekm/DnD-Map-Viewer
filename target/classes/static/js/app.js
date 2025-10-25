@@ -26,6 +26,10 @@ class DnDMapViewer {
         this.fogPollingInterval = null;
         this.lastFogStateHash = null;
 
+        // Śledzenie już odkrytych komórek aby nie wysyłać ponownie
+        this.revealedCells = new Set();
+        this.paintedCells = new Set();
+
         // Zmienne dla kolorów
         this.fogColor = '#808080';
         this.fogOpacity = 0.65;
@@ -611,6 +615,24 @@ class DnDMapViewer {
             if(res.ok) {
                 this.fogState = await res.json();
                 this.lastFogStateHash = this.calculateFogStateHash(this.fogState);
+
+                // Zainicjalizuj sety odkrytych komórek na podstawie wczytanego stanu
+                this.revealedCells.clear();
+                this.paintedCells.clear();
+
+                if(this.fogState && this.fogState.revealedAreas) {
+                    this.fogState.revealedAreas.forEach(point => {
+                        if(point.isGridCell && this.gridSize) {
+                            // Oblicz pozycję komórki
+                            const cellX = Math.round(point.x - this.gridSize / 2);
+                            const cellY = Math.round(point.y - this.gridSize / 2);
+                            const cellKey = `${cellX},${cellY}`;
+                            this.revealedCells.add(cellKey);
+                        }
+                    });
+                }
+
+                console.log(`Wczytano stan mgły: ${this.revealedCells.size} odkrytych komórek`);
                 this.renderFog();
             }
         } catch(e){
@@ -925,19 +947,45 @@ class DnDMapViewer {
                 if(cellX < 0 || cellY < 0 || cellX + this.gridSize > this.currentMap.width ||
                    cellY + this.gridSize > this.currentMap.height) continue;
                 this.fogCtx.fillRect(cellX, cellY, this.gridSize, this.gridSize);
-                this.queueCell(cellX, cellY);
+                this.queueCell(cellX, cellY, 'erase'); // Usuwanie mgły
             }
         }
     }
 
-    queueCell(x, y){
+    queueCell(x, y, action = 'erase'){
+        // Utwórz unikalny klucz dla komórki
+        const cellKey = `${Math.round(x)},${Math.round(y)}`;
+
+        // Sprawdź czy komórka już jest w kolejce w tym samym stanie
+        const alreadyQueued = this.pendingFogPoints.some(p => {
+            const px = Math.round(p.x - this.gridSize / 2);
+            const py = Math.round(p.y - this.gridSize / 2);
+            return px === Math.round(x) && py === Math.round(y) && p.action === action;
+        });
+
+        if(alreadyQueued) {
+            return; // Już w kolejce, nie dodawaj ponownie
+        }
+
+        // Dodaj do odpowiedniego setu dla śledzenia
+        if(action === 'erase') {
+            this.revealedCells.add(cellKey);
+            this.paintedCells.delete(cellKey);
+        } else {
+            this.paintedCells.add(cellKey);
+            this.revealedCells.delete(cellKey);
+        }
+
         this.pendingFogPoints.push({
             x: x + this.gridSize / 2,
             y: y + this.gridSize / 2,
             radius: this.gridSize / 2,
-            isGridCell: true
+            isGridCell: true,
+            action: action
         });
-        if(this.pendingFogPoints.length >= 10) this.flushPending();
+
+        // Zwiększony buffer do 30 punktów dla lepszej wydajności
+        if(this.pendingFogPoints.length >= 30) this.flushPending();
         else this.scheduleFlush();
     }
 
@@ -957,31 +1005,43 @@ class DnDMapViewer {
 
         // Grupuj punkty według akcji
         const paintPoints = pts.filter(p => p.action === 'paint');
-        const erasePoints = pts.filter(p => p.action === 'erase' || !p.action); // domyślnie erase dla kompatybilności
+        const erasePoints = pts.filter(p => p.action === 'erase' || !p.action);
+
+        console.log(`Wysyłanie do serwera: ${paintPoints.length} malowanie, ${erasePoints.length} usuwanie`);
 
         try {
-            // Malowanie mgły = usuwanie z odkrytych obszarów (przeciwieństwo reveal)
+            // Malowanie mgły = usuwanie z odkrytych obszarów
             if(paintPoints.length > 0) {
-                await fetch(`/api/fog/${this.currentMap.name}/hide-batch`, {
+                const res = await fetch(`/api/fog/${this.currentMap.name}/hide-batch`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(paintPoints)
                 });
+
+                if(!res.ok) {
+                    throw new Error(`Błąd malowania mgły: ${res.status}`);
+                }
+                console.log(`✓ Zapisano ${paintPoints.length} punktów malowania mgły`);
             }
 
             // Usuwanie mgły = dodawanie do odkrytych obszarów
             if(erasePoints.length > 0) {
-                await fetch(`/api/fog/${this.currentMap.name}/reveal-batch`, {
+                const res = await fetch(`/api/fog/${this.currentMap.name}/reveal-batch`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(erasePoints)
                 });
+
+                if(!res.ok) {
+                    throw new Error(`Błąd usuwania mgły: ${res.status}`);
+                }
+                console.log(`✓ Zapisano ${erasePoints.length} punktów usuwania mgły`);
             }
 
-            // Odśwież stan mgły po zapisie zmian
-            await this.syncFogState();
+            // NIE wywołuj syncFogState() - synchronizacja co 2 sekundy przez polling
         } catch(e){
-            console.error('Błąd zapisu mgły', e);
+            console.error('❌ Błąd zapisu mgły:', e);
+            // Przywróć punkty do kolejki
             this.pendingFogPoints.push(...pts);
         }
     }
@@ -1477,7 +1537,7 @@ class DnDMapViewer {
                 this.fogCtx.fillRect(cellX, cellY, this.gridSize, this.gridSize);
 
                 // Dodaj punkt do kolejki do zapisania na serwerze - usuń z odkrytych obszarów
-                this.queueFogCell(cellX + this.gridSize/2, cellY + this.gridSize/2, 'paint');
+                this.queueCell(cellX, cellY, 'paint');
             }
         }
     }
@@ -1503,7 +1563,7 @@ class DnDMapViewer {
                 this.fogCtx.fillRect(cellX, cellY, this.gridSize, this.gridSize);
 
                 // Dodaj punkt do kolejki do zapisania na serwerze
-                this.queueFogCell(cellX + this.gridSize/2, cellY + this.gridSize/2, 'erase');
+                this.queueCell(cellX, cellY, 'erase');
             }
         }
     }
