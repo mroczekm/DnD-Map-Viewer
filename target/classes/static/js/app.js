@@ -31,6 +31,7 @@ class DnDMapViewer {
         this.fogOpacity = 0.65;
         this.gridColor = '#ffffff';
         this.gridOpacity = 0.35;
+        this.gridLineWidth = 1.0;
 
         // Viewport podglądu
         this.previewViewport = null;
@@ -84,6 +85,8 @@ class DnDMapViewer {
 
     initElements(){
         this.mapSelect = document.getElementById('mapSelect');
+        this.addMapBtn = document.getElementById('addMapBtn');
+        this.deleteMapBtn = document.getElementById('deleteMapBtn');
         this.mapImage = document.getElementById('mapImage');
         this.mapWrapper = document.getElementById('mapWrapper');
         this.mapContainer = document.getElementById('mapContainer');
@@ -95,7 +98,6 @@ class DnDMapViewer {
         this.calibrationCtx = this.calibrationCanvas.getContext('2d');
         this.gridAreaSize = document.getElementById('gridAreaSize');
         this.resetFogBtn = document.getElementById('resetFogBtn');
-        this.calibrateGridBtn = document.getElementById('calibrateGridBtn');
         this.toggleGridBtn = document.getElementById('toggleGridBtn');
         this.gridStatus = document.getElementById('gridStatus');
         this.zoomInBtn = document.getElementById('zoomInBtn');
@@ -107,9 +109,12 @@ class DnDMapViewer {
         this.navLeftBtn = document.getElementById('navLeftBtn');
         this.navRightBtn = document.getElementById('navRightBtn');
         this.navCenterBtn = document.getElementById('navCenterBtn');
+        this.gridCountXInput = document.getElementById('gridCountXInput');
+        this.gridCountYInput = document.getElementById('gridCountYInput');
         this.gridSizeInput = document.getElementById('gridSizeInput');
         this.gridOffsetXInput = document.getElementById('gridOffsetXInput');
         this.gridOffsetYInput = document.getElementById('gridOffsetYInput');
+        this.gridLineWidthInput = document.getElementById('gridLineWidthInput');
         this.saveGridBtn = document.getElementById('saveGridBtn');
         this.clearGridBtn = document.getElementById('clearGridBtn');
         this.paintFogBtn = document.getElementById('paintFogBtn');
@@ -168,9 +173,23 @@ class DnDMapViewer {
             this.mapSelect.addEventListener('change', e => {
                 console.log('Map selected:', e.target.value);
                 this.loadMap(e.target.value);
+
+                // Odśwież postacie i mgłę po załadowaniu mapy
+                setTimeout(() => {
+                    this.loadCharacters();
+                    this.loadFogState();
+                }, 500); // Daj czas na załadowanie mapy
             });
         } else {
             console.error('mapSelect element not found');
+        }
+
+        // Event listenery dla zarządzania mapami
+        if(this.addMapBtn) {
+            this.addMapBtn.addEventListener('click', () => this.showAddMapDialog());
+        }
+        if(this.deleteMapBtn) {
+            this.deleteMapBtn.addEventListener('click', () => this.deleteCurrentMap());
         }
 
         if(this.gridAreaSize) {
@@ -226,30 +245,64 @@ class DnDMapViewer {
         ['dragstart', 'selectstart', 'contextmenu'].forEach(ev =>
             this.mapContainer.addEventListener(ev, evn => evn.preventDefault())
         );
-        this.calibrateGridBtn.addEventListener('click', () => {
-            if(!this.currentMap) return alert('Wybierz mapę!');
-            this.startGridCalibration();
-        });
+
         this.toggleGridBtn.addEventListener('click', () => this.toggleGrid());
+
+        // Event listenery dla ilości kratek - automatyczne wyliczanie rozmiaru
+        this.gridCountXInput.addEventListener('change', () => this.calculateGridSizeFromCount());
+        this.gridCountYInput.addEventListener('change', () => this.calculateGridSizeFromCount());
+
         this.gridSizeInput.addEventListener('change', () => {
-            const v = parseInt(this.gridSizeInput.value);
+            const v = parseFloat(this.gridSizeInput.value);
             if(v > 0){
                 this.gridSize = v;
                 this.drawGrid();
-                this.gridStatus.textContent = `Siatka: ${this.gridSize}px (niezapisana)`;
+                this.gridStatus.textContent = `Siatka: ${this.gridSize.toFixed(1)}px (niezapisana)`;
             }
         });
+        // Również obsługuj input event dla natychmiastowej aktualizacji
+        this.gridSizeInput.addEventListener('input', () => {
+            const v = parseFloat(this.gridSizeInput.value);
+            if(v > 0){
+                this.gridSize = v;
+                this.drawGrid();
+            }
+        });
+
         this.gridOffsetXInput.addEventListener('change', () => {
-            this.gridOffsetX = parseInt(this.gridOffsetXInput.value) || 0;
+            this.gridOffsetX = parseFloat(this.gridOffsetXInput.value) || 0;
             this.drawGrid();
             this.gridStatus.textContent = `Siatka: ${this.gridSize || '?'}px (niezapisana)`;
         });
+        this.gridOffsetXInput.addEventListener('input', () => {
+            this.gridOffsetX = parseFloat(this.gridOffsetXInput.value) || 0;
+            this.drawGrid();
+        });
+
         this.gridOffsetYInput.addEventListener('change', () => {
-            this.gridOffsetY = parseInt(this.gridOffsetYInput.value) || 0;
+            this.gridOffsetY = parseFloat(this.gridOffsetYInput.value) || 0;
             this.drawGrid();
             this.gridStatus.textContent = `Siatka: ${this.gridSize || '?'}px (niezapisana)`;
         });
+        this.gridOffsetYInput.addEventListener('input', () => {
+            this.gridOffsetY = parseFloat(this.gridOffsetYInput.value) || 0;
+            this.drawGrid();
+        });
+
+        this.gridLineWidthInput.addEventListener('change', () => {
+            this.gridLineWidth = parseFloat(this.gridLineWidthInput.value) || 1.0;
+            this.drawGrid();
+            this.gridStatus.textContent = `Siatka: ${this.gridSize || '?'}px (niezapisana)`;
+        });
+        this.gridLineWidthInput.addEventListener('input', () => {
+            this.gridLineWidth = parseFloat(this.gridLineWidthInput.value) || 1.0;
+            this.drawGrid();
+        });
+
+        // Przyciski zapisu i usuwania siatki
+        this.saveGridBtn.addEventListener('click', () => this.saveGridConfig());
         this.clearGridBtn.addEventListener('click', () => this.clearGridConfig());
+
         this.paintFogBtn.addEventListener('click', () => this.toggleFogMode('paint'));
         this.eraseFogBtn.addEventListener('click', () => this.toggleFogMode('erase'));
 
@@ -358,6 +411,114 @@ class DnDMapViewer {
             content.classList.add('expanded');
             toggle.classList.remove('collapsed');
             icon.textContent = 'expand_less';
+        }
+    }
+
+    // ===== ZARZĄDZANIE MAPAMI =====
+
+    async loadMapsList() {
+        try {
+            const response = await fetch('/api/maps');
+            if (!response.ok) {
+                throw new Error('Nie można pobrać listy map');
+            }
+
+            const maps = await response.json();
+            console.log('Wczytano listę map:', maps);
+
+            // Wyczyść select
+            this.mapSelect.innerHTML = '<option value="">-- Wybierz mapę --</option>';
+
+            // Dodaj mapy do selecta
+            maps.forEach(map => {
+                const option = document.createElement('option');
+                option.value = map.name;
+                option.textContent = map.name;
+                this.mapSelect.appendChild(option);
+            });
+
+            console.log('Lista map wypełniona, dostępnych map:', maps.length);
+        } catch (error) {
+            console.error('Błąd wczytywania listy map:', error);
+            alert('Nie można wczytać listy map. Sprawdź czy serwer działa.');
+        }
+    }
+
+    showAddMapDialog() {
+        const mapName = prompt('Podaj nazwę mapy:');
+        if (!mapName || mapName.trim() === '') {
+            return;
+        }
+
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                this.uploadMap(mapName.trim(), file);
+            }
+        };
+        fileInput.click();
+    }
+
+    async uploadMap(mapName, file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('name', mapName);
+
+        try {
+            const response = await fetch('/api/maps/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                alert(`Mapa "${mapName}" została dodana!`);
+                // Odśwież listę map
+                await this.loadMapsList();
+            } else {
+                const error = await response.text();
+                alert(`Błąd podczas dodawania mapy: ${error}`);
+            }
+        } catch (error) {
+            console.error('Error uploading map:', error);
+            alert('Błąd podczas dodawania mapy');
+        }
+    }
+
+    async deleteCurrentMap() {
+        const mapName = this.mapSelect.value;
+        if (!mapName) {
+            alert('Wybierz mapę do usunięcia');
+            return;
+        }
+
+        if (!confirm(`Czy na pewno chcesz usunąć mapę "${mapName}"?\nTa operacja jest nieodwracalna!`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/maps/${mapName}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert(`Mapa "${mapName}" została usunięta`);
+                // Wyczyść aktualnie wybraną mapę
+                this.currentMap = null;
+                this.mapImage.classList.add('hidden');
+                this.fogCanvas.classList.add('hidden');
+                this.gridCanvas.classList.add('hidden');
+                // Odśwież listę map
+                await this.loadMapsList();
+            } else {
+                const error = await response.text();
+                alert(`Błąd podczas usuwania mapy: ${error}`);
+            }
+        } catch (error) {
+            console.error('Error deleting map:', error);
+            alert('Błąd podczas usuwania mapy');
         }
     }
 
@@ -481,6 +642,7 @@ class DnDMapViewer {
         this.calibrationStart = null;
         this.calibrationCurrent = null;
         this.calibrationCanvas.classList.remove('hidden');
+        this.mapContainer.classList.add('calibrating'); // Dodaj klasę dla kursora krzyżyka
         this.renderCalibrationOverlay();
     }
 
@@ -495,26 +657,101 @@ class DnDMapViewer {
             this.gridOffsetX = Math.round(this.calibrationStart.x % this.gridSize);
             this.gridOffsetY = Math.round(this.calibrationStart.y % this.gridSize);
             this.isCalibrating = false;
+            this.mapContainer.classList.remove('calibrating'); // Usuń klasę kursora krzyżyka
             this.calibrationStart = null;
             this.calibrationCurrent = null;
             this.gridVisible = true;
+
+            // NAJPIERW wypełnij pola aby użytkownik od razu widział wartości
+            this.gridSizeInput.value = this.gridSize.toFixed(1);
+            this.gridOffsetXInput.value = this.gridOffsetX.toFixed(1);
+            this.gridOffsetYInput.value = this.gridOffsetY.toFixed(1);
+            this.gridLineWidthInput.value = this.gridLineWidth.toFixed(1);
+            this.gridCountXInput.value = '';
+            this.gridCountYInput.value = '';
+
+            this.drawGrid();
+            this.gridCanvas.classList.remove('hidden');
+            this.gridStatus.textContent = `Siatka: ${this.gridSize.toFixed(1)}px (kalibracja zakończona, zapisywanie...)`;
+            this.renderCalibrationOverlay();
+
+            // POTEM zapisz na serwerze
             fetch(`/api/grid/${this.currentMap.name}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     gridSize: this.gridSize,
                     offsetX: this.gridOffsetX,
-                    offsetY: this.gridOffsetY
+                    offsetY: this.gridOffsetY,
+                    lineWidth: this.gridLineWidth
                 })
             }).then(() => {
-                this.gridSizeInput.value = this.gridSize;
-                this.gridOffsetXInput.value = this.gridOffsetX;
-                this.gridOffsetYInput.value = this.gridOffsetY;
-                this.drawGrid();
-                this.gridCanvas.classList.remove('hidden');
-                this.gridStatus.textContent = `Siatka: ${this.gridSize}px (skalibrowana)`;
-                this.renderCalibrationOverlay();
-            }).catch(() => alert('Błąd zapisu siatki'));
+                this.gridStatus.textContent = `Siatka: ${this.gridSize.toFixed(1)}px (zapisana)`;
+                console.log('Siatka zapisana:', {gridSize: this.gridSize, offsetX: this.gridOffsetX, offsetY: this.gridOffsetY});
+            }).catch((err) => {
+                console.error('Błąd zapisu siatki:', err);
+                alert('Błąd zapisu siatki');
+            });
+        }
+    }
+
+    calculateGridSizeFromCount() {
+        if (!this.currentMap) {
+            alert('Wybierz mapę najpierw');
+            return;
+        }
+
+        const countX = parseInt(this.gridCountXInput.value);
+        const countY = parseInt(this.gridCountYInput.value);
+
+        if (countX > 0 && countY > 0) {
+            // Wylicz rozmiar kratki dla obu wymiarów
+            const sizeX = this.currentMap.width / countX;
+            const sizeY = this.currentMap.height / countY;
+
+            // Użyj MNIEJSZEJ wartości aby kratki były kwadratowe i zmieściły się w całym obrazie
+            // To gwarantuje że siatka NIE wyjdzie poza obraz w żadnym wymiarze
+            this.gridSize = Math.min(sizeX, sizeY);
+
+            // Zaokrąglij do 2 miejsc po przecinku dla precyzji
+            this.gridSize = Math.round(this.gridSize * 100) / 100;
+
+            this.gridSizeInput.value = this.gridSize.toFixed(2);
+
+            // Wycentruj siatkę - wylicz offset aby siatka była na środku
+            const totalWidthUsed = this.gridSize * countX;
+            const totalHeightUsed = this.gridSize * countY;
+
+            this.gridOffsetX = Math.round((this.currentMap.width - totalWidthUsed) / 2 * 100) / 100;
+            this.gridOffsetY = Math.round((this.currentMap.height - totalHeightUsed) / 2 * 100) / 100;
+
+            this.gridOffsetXInput.value = this.gridOffsetX.toFixed(2);
+            this.gridOffsetYInput.value = this.gridOffsetY.toFixed(2);
+
+            // Ustaw siatkę jako widoczną
+            this.gridVisible = true;
+            this.gridCanvas.classList.remove('hidden');
+
+            this.drawGrid();
+
+            this.gridStatus.textContent = `Siatka: ${countX}x${countY} (${this.gridSize.toFixed(2)}px, kwadratowa, wycentrowana)`;
+
+            console.log('Wygenerowano siatkę z ilości kratek:', {
+                countX,
+                countY,
+                gridSize: this.gridSize,
+                mapWidth: this.currentMap.width,
+                mapHeight: this.currentMap.height,
+                sizeX: sizeX.toFixed(2),
+                sizeY: sizeY.toFixed(2),
+                usedSize: Math.min(sizeX, sizeY).toFixed(2),
+                offsetX: this.gridOffsetX,
+                offsetY: this.gridOffsetY,
+                coverageX: (this.gridSize * countX).toFixed(2) + 'px z ' + this.currentMap.width + 'px',
+                coverageY: (this.gridSize * countY).toFixed(2) + 'px z ' + this.currentMap.height + 'px',
+                marginX: (this.currentMap.width - totalWidthUsed).toFixed(2) + 'px',
+                marginY: (this.currentMap.height - totalHeightUsed).toFixed(2) + 'px'
+            });
         }
     }
 
@@ -546,17 +783,21 @@ class DnDMapViewer {
         this.gridCtx.clearRect(0, 0, this.currentMap.width, this.currentMap.height);
         if(!this.gridSize || !this.gridVisible) return;
 
-        // Użyj kolorów z kontrolek
+        // Użyj kolorów i grubości linii z kontrolek
         const gridColorRgba = this.hexToRgba(this.gridColor, this.gridOpacity);
         this.gridCtx.strokeStyle = gridColorRgba;
-        this.gridCtx.lineWidth = 1;
+        this.gridCtx.lineWidth = this.gridLineWidth;
 
+        // Rysuj linie pionowe - zaczynaj DOKŁADNIE od offsetu
+        // Dla kwadratowych siatek offset jest wyliczony aby wycentrować siatkę
         for(let x = this.gridOffsetX; x <= this.currentMap.width; x += this.gridSize){
             this.gridCtx.beginPath();
             this.gridCtx.moveTo(x, 0);
             this.gridCtx.lineTo(x, this.currentMap.height);
             this.gridCtx.stroke();
         }
+
+        // Rysuj linie poziome - zaczynaj DOKŁADNIE od offsetu
         for(let y = this.gridOffsetY; y <= this.currentMap.height; y += this.gridSize){
             this.gridCtx.beginPath();
             this.gridCtx.moveTo(0, y);
@@ -610,11 +851,28 @@ class DnDMapViewer {
 
     getGridCell(x, y){
         if(!this.gridSize) return null;
-        const ax = x - this.gridOffsetX, ay = y - this.gridOffsetY;
-        return {
-            x: Math.floor(ax / this.gridSize) * this.gridSize + this.gridOffsetX,
-            y: Math.floor(ay / this.gridSize) * this.gridSize + this.gridOffsetY
-        };
+
+        // Uwzględnij offset przy wyliczaniu pozycji kratki
+        const ax = x - this.gridOffsetX;
+        const ay = y - this.gridOffsetY;
+
+        // Jeśli kliknięcie jest przed offsetem, zwróć null (poza siatką)
+        if(ax < 0 || ay < 0) return null;
+
+        // Wylicz indeks kratki
+        const cellIndexX = Math.floor(ax / this.gridSize);
+        const cellIndexY = Math.floor(ay / this.gridSize);
+
+        // Wylicz pozycję kratki (lewy górny róg)
+        const cellX = cellIndexX * this.gridSize + this.gridOffsetX;
+        const cellY = cellIndexY * this.gridSize + this.gridOffsetY;
+
+        // Sprawdź czy kratka mieści się w granicach mapy
+        if(cellX >= this.currentMap.width || cellY >= this.currentMap.height) {
+            return null;
+        }
+
+        return { x: cellX, y: cellY };
     }
 
     updateHighlight(e){
@@ -734,30 +992,38 @@ class DnDMapViewer {
             return;
         }
         if(!this.gridSize || this.gridSize <= 0){
-            alert('Niepoprawny rozmiar siatki');
+            alert('Niepoprawny rozmiar siatki (musi być > 0)');
             return;
         }
         try {
             const body = {
                 gridSize: this.gridSize,
-                offsetX: this.gridOffsetX,
-                offsetY: this.gridOffsetY
+                offsetX: this.gridOffsetX || 0,
+                offsetY: this.gridOffsetY || 0,
+                lineWidth: this.gridLineWidth || 1.0
             };
+
+            console.log('Zapisywanie konfiguracji siatki:', body);
+
             const r = await fetch(`/api/grid/${this.currentMap.name}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(body)
             });
+
             if(!r.ok){
                 const txt = await r.text();
                 throw new Error(txt || 'Błąd zapisu');
             }
-            this.gridStatus.textContent = `Siatka: ${this.gridSize}px (zapisana)`;
-            alert('Siatka zapisana');
-            this.gridVisible = true;
-            this.gridCanvas.classList.remove('hidden');
-            this.drawGrid();
+
+            console.log('Siatka zapisana, przeładowywanie...');
+
+            // Przeładuj konfigurację z serwera aby mieć pewność że jest zsynchronizowana
+            await this.loadGridConfig();
+
+            alert('Siatka zapisana pomyślnie!');
         } catch(e){
+            console.error('Błąd zapisu siatki:', e);
             alert('Błąd zapisu siatki: ' + e.message);
         }
     }
@@ -790,14 +1056,21 @@ class DnDMapViewer {
             if(r.ok){
                 const cfg = await r.json();
                 this.gridSize = cfg.gridSize;
-                this.gridOffsetX = Math.round(cfg.offsetX);
-                this.gridOffsetY = Math.round(cfg.offsetY);
-                this.gridSizeInput.value = this.gridSize;
-                this.gridOffsetXInput.value = this.gridOffsetX;
-                this.gridOffsetYInput.value = this.gridOffsetY;
+                this.gridOffsetX = cfg.offsetX || 0;
+                this.gridOffsetY = cfg.offsetY || 0;
+                this.gridLineWidth = cfg.lineWidth || 1.0;
+
+                // Wypełnij pola z formatowaniem do 1 miejsca po przecinku
+                this.gridSizeInput.value = this.gridSize.toFixed(1);
+                this.gridOffsetXInput.value = this.gridOffsetX.toFixed(1);
+                this.gridOffsetYInput.value = this.gridOffsetY.toFixed(1);
+                this.gridLineWidthInput.value = this.gridLineWidth.toFixed(1);
+                this.gridCountXInput.value = '';
+                this.gridCountYInput.value = '';
+
                 this.gridVisible = true;
                 this.gridCanvas.classList.remove('hidden');
-                this.gridStatus.textContent = `Siatka: ${this.gridSize}px (wczytana)`;
+                this.gridStatus.textContent = `Siatka: ${this.gridSize.toFixed(1)}px (wczytana)`;
                 this.drawGrid();
             } else {
                 this.gridSize = null;
@@ -807,6 +1080,8 @@ class DnDMapViewer {
                 this.gridSizeInput.value = '';
                 this.gridOffsetXInput.value = '0';
                 this.gridOffsetYInput.value = '0';
+                this.gridLineWidthInput.value = '1';
+                this.gridLineWidth = 1.0;
             }
         } catch(e){
             console.error(e);
@@ -947,6 +1222,18 @@ class DnDMapViewer {
             return;
         }
         
+        // Obsługa przeciągania postaci
+        if(this.draggingCharacter && this.gridSize) {
+            // Wizualizacja gdzie postać zostanie upuszczona (opcjonalne)
+            const pos = this.getMousePos(e);
+            const cell = this.getGridCell(pos.x, pos.y);
+            if(cell) {
+                // Możesz tu dodać wizualizację (np. podświetlenie kratki)
+                this.updateCursor();
+            }
+            return;
+        }
+
         // Podświetlanie kratek w trybie mgły
         if((this.isPaintingFog || this.isErasingFog) && this.gridSize) {
             this.updateHighlight(e);
@@ -1098,9 +1385,16 @@ class DnDMapViewer {
         this.isPaintingFog = this.fogMode === 'paint';
         this.isErasingFog = this.fogMode === 'erase';
         
-        // Aktualizuj wygląd przycisków używając klas Material Design
-        this.paintFogBtn.classList.toggle('active', this.isPaintingFog);
-        this.eraseFogBtn.classList.toggle('active', this.isErasingFog);
+        // Usuń wszystkie klasy active najpierw
+        this.paintFogBtn.classList.remove('active');
+        this.eraseFogBtn.classList.remove('active');
+
+        // Dodaj klasę active tylko do wybranego przycisku
+        if (this.isPaintingFog) {
+            this.paintFogBtn.classList.add('active');
+        } else if (this.isErasingFog) {
+            this.eraseFogBtn.classList.add('active');
+        }
 
         // Aktualizuj kursor
         this.updateCursor();
@@ -1895,6 +2189,9 @@ class DnDMapViewer {
 // Inicjalizacja aplikacji
 document.addEventListener('DOMContentLoaded', () => {
     window.mapViewer = new DnDMapViewer();
+
+    // Wczytaj listę map z serwera
+    window.mapViewer.loadMapsList();
 });
 
 // Obsługa przycisku ustawiania podglądu

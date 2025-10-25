@@ -359,42 +359,70 @@
         }
 
 
-        // Prostszy i szybszy szum
-        function fastNoise(x, y, seed = 0) {
-            const n = Math.sin(x * 0.1 + y * 0.13 + seed) *
-                     Math.cos(x * 0.07 + y * 0.11 + seed * 0.5);
-            return (n + 1) * 0.5; // normalizuj do 0-1
+        // Ulepszony szum dla bardziej realistycznej mgły
+        function perlinNoise(x, y, seed = 0) {
+            // Prosta implementacja szumu Perlina
+            const ix = Math.floor(x);
+            const iy = Math.floor(y);
+            const fx = x - ix;
+            const fy = y - iy;
+
+            // Interpolacja dla płynności
+            const u = fx * fx * (3 - 2 * fx);
+            const v = fy * fy * (3 - 2 * fy);
+
+            const a = Math.sin((ix + iy * 57 + seed) * 0.05) * Math.cos((ix * 37 + iy + seed) * 0.07);
+            const b = Math.sin((ix + 1 + iy * 57 + seed) * 0.05) * Math.cos(((ix + 1) * 37 + iy + seed) * 0.07);
+            const c = Math.sin((ix + (iy + 1) * 57 + seed) * 0.05) * Math.cos((ix * 37 + (iy + 1) + seed) * 0.07);
+            const d = Math.sin((ix + 1 + (iy + 1) * 57 + seed) * 0.05) * Math.cos(((ix + 1) * 37 + (iy + 1) + seed) * 0.07);
+
+            const k0 = a;
+            const k1 = b - a;
+            const k2 = c - a;
+            const k3 = a - b - c + d;
+
+            return (k0 + k1 * u + k2 * v + k3 * u * v + 1) * 0.5;
         }
 
         function drawFogBackground(ctx, width, height, time = 0) {
+            // Walidacja wymiarów - muszą być większe niż 0
+            if (!width || !height || width <= 0 || height <= 0) {
+                console.warn('Invalid dimensions for fog background:', width, height);
+                return;
+            }
+
             const imageData = ctx.createImageData(width, height);
 
-            // Bardziej dynamiczny ruch mgły
-            const step = 4;
-            const windTime = time * 0.005; // zwiększona prędkość 5x
+            // Szybszy, bardziej widoczny ruch mgły
+            const step = 3; // Mniejszy krok dla gładszej mgły
+            const windTime = time * 0.002; // Przyspieszony dryf - 2.5x szybszy
 
             for (let y = 0; y < height; y += step) {
                 for (let x = 0; x < width; x += step) {
-                    // Większe przesunięcia dla wyraźnej animacji
-                    const nx = x * 0.008 + windTime;
-                    const ny = y * 0.008 + windTime * 0.6;
+                    // Skala dla różnych warstw
+                    const scale1 = 0.003;
+                    const scale2 = 0.006;
+                    const scale3 = 0.012;
 
-                    // Dodatkowe przesunięcia w różnych kierunkach
-                    const offsetX = Math.sin(windTime * 0.3) * 50;
-                    const offsetY = Math.cos(windTime * 0.2) * 30;
+                    // Subtelne przesunięcia - mgła dryfuje powoli
+                    const drift1X = Math.sin(windTime * 0.3) * 20;
+                    const drift1Y = Math.cos(windTime * 0.2) * 15;
+                    const drift2X = Math.sin(windTime * 0.5 + 100) * 30;
+                    const drift2Y = Math.cos(windTime * 0.4 + 100) * 25;
 
-                    // Bardziej dynamiczne warstwy
-                    const cloud1 = fastNoise(nx + offsetX * 0.01, ny + offsetY * 0.01, windTime);
-                    const cloud2 = fastNoise((nx + offsetX * 0.01) * 1.5, (ny + offsetY * 0.01) * 1.5, windTime + 100);
+                    // Trzy warstwy mgły o różnych skalach i prędkościach
+                    const layer1 = perlinNoise((x + drift1X) * scale1, (y + drift1Y) * scale1, windTime * 10);
+                    const layer2 = perlinNoise((x + drift2X) * scale2, (y + drift2Y) * scale2, windTime * 15 + 1000);
+                    const layer3 = perlinNoise(x * scale3, y * scale3, windTime * 20 + 2000);
 
-                    // Dodatkowa warstwa z szybkim ruchem
-                    const quickCloud = Math.sin(nx * 3 + windTime * 2) * Math.cos(ny * 3 + windTime * 1.5) * 0.2;
+                    // Kombinacja warstw z różnymi wagami
+                    const cloudDensity = layer1 * 0.5 + layer2 * 0.3 + layer3 * 0.2;
 
-                    const cloudDensity = (cloud1 * 0.5 + cloud2 * 0.3 + quickCloud + 0.5);
-                    const grayValue = Math.floor(60 + cloudDensity * 70);
-                    const clampedGray = Math.max(50, Math.min(130, grayValue));
+                    // Konwersja do odcieni szarości z większym kontrastem
+                    const grayValue = Math.floor(50 + cloudDensity * 90);
+                    const clampedGray = Math.max(40, Math.min(140, grayValue));
 
-                    // Wypełnij blok 4x4 tym samym kolorem
+                    // Wypełnij blok
                     for (let dy = 0; dy < step && y + dy < height; dy++) {
                         for (let dx = 0; dx < step && x + dx < width; dx++) {
                             const idx = ((y + dy) * width + (x + dx)) * 4;
@@ -412,10 +440,19 @@
 
         function renderFog() {
             if (!fogState || !mapImage.complete) return;
+
+            // Ustaw wymiary canvas
             fogLayer.width = mapImage.naturalWidth;
             fogLayer.height = mapImage.naturalHeight;
             fogLayer.style.width = mapImage.width + 'px';
             fogLayer.style.height = mapImage.height + 'px';
+
+            // Walidacja wymiarów
+            if (!fogLayer.width || !fogLayer.height || fogLayer.width <= 0 || fogLayer.height <= 0) {
+                console.warn('Invalid fog layer dimensions:', fogLayer.width, fogLayer.height);
+                return;
+            }
+
             const ctx = fogLayer.getContext('2d');
             ctx.clearRect(0, 0, fogLayer.width, fogLayer.height);
             drawFogBackground(ctx, fogLayer.width, fogLayer.height, animationTime);
@@ -457,8 +494,7 @@
         }
 
         function animateFog() {
-            animationTime += 50; // znacznie zwiększona prędkość
-            console.log('Animating fog, time:', animationTime); // debug log
+            animationTime += 32; // ~60 FPS, szybsza animacja - 2x szybszy przyrost
             renderFog();
             animationFrame = requestAnimationFrame(animateFog);
         }

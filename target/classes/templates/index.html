@@ -34,6 +34,19 @@
                                 <option th:each="map : ${maps}" th:value="${map.name}" th:text="${map.name}"></option>
                             </select>
                         </div>
+
+                        <div class="map-actions">
+                            <button id="addMapBtn" class="mdc-button mdc-button--outlined map-action-btn">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">add</i>
+                                <span class="mdc-button__label">Dodaj mapę</span>
+                            </button>
+                            <button id="deleteMapBtn" class="mdc-button mdc-button--outlined map-action-btn map-action-btn--danger">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">delete</i>
+                                <span class="mdc-button__label">Usuń mapę</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -51,11 +64,17 @@
                                 <i class="material-icons mdc-button__icon">cleaning_services</i>
                                 <span class="mdc-button__label">Usuń mgłę</span>
                             </button>
+                        </div>
+
+                        <div class="fog-controls">
                             <button id="paintFogBtn" class="mdc-button mdc-button--outlined fog-btn">
                                 <span class="mdc-button__ripple"></span>
                                 <i class="material-icons mdc-button__icon">brush</i>
                                 <span class="mdc-button__label">Maluj mgłę</span>
                             </button>
+                        </div>
+
+                        <div class="fog-controls">
                             <button id="resetFogBtn" class="mdc-button mdc-button--outlined fog-btn fog-btn--danger">
                                 <span class="mdc-button__ripple"></span>
                                 <i class="material-icons mdc-button__icon">restart_alt</i>
@@ -79,12 +98,12 @@
 
                 <!-- Characters Section -->
                 <div class="control-section">
-                    <div class="section-toggle" data-target="characters-management">
+                    <div class="section-toggle collapsed" data-target="characters-management">
                         <i class="material-icons">people</i>
                         <span>Postacie</span>
-                        <i class="material-icons toggle-icon">expand_less</i>
+                        <i class="material-icons toggle-icon">expand_more</i>
                     </div>
-                    <div class="section-content expanded" id="characters-management">
+                    <div class="section-content" id="characters-management">
                         <div class="character-info">
                             <p class="info-text">
                                 <i class="material-icons info-icon">info</i>
@@ -132,16 +151,6 @@
                             </button>
                         </div>
 
-                        <div class="character-color-controls">
-                            <div class="color-control">
-                                <label for="playerColorPicker">Kolor gracza:</label>
-                                <input type="color" id="playerColorPicker" value="#00ff00" class="color-picker">
-                            </div>
-                            <div class="color-control">
-                                <label for="enemyColorPicker">Kolor wroga:</label>
-                                <input type="color" id="enemyColorPicker" value="#ff0000" class="color-picker">
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -202,6 +211,17 @@
                             </div>
                         </div>
 
+                        <div class="character-color-controls">
+                            <div class="color-control">
+                                <label for="playerColorPicker">Kolor gracza:</label>
+                                <input type="color" id="playerColorPicker" value="#00ff00" class="color-picker">
+                            </div>
+                            <div class="color-control">
+                                <label for="enemyColorPicker">Kolor wroga:</label>
+                                <input type="color" id="enemyColorPicker" value="#ff0000" class="color-picker">
+                            </div>
+                        </div>
+
                         <div class="fog-color-controls">
                             <div class="color-control">
                                 <label for="previewViewportColorPicker">Kolor ramki podglądu:</label>
@@ -215,54 +235,45 @@
                 <div class="control-section">
                     <div class="section-toggle" data-target="grid-calibration">
                         <i class="material-icons">grid_on</i>
-                        <span>Kalibracja siatki</span>
+                        <span>Konfiguracja siatki</span>
                         <i class="material-icons toggle-icon">expand_more</i>
                     </div>
                     <div class="section-content" id="grid-calibration">
                         <div class="status-chip">
-                            <span id="gridStatus" class="mdc-typography--caption">Siatka: niekalibrowana</span>
-                        </div>
-
-                        <div class="calibration-actions">
-                            <button id="calibrateGridBtn" class="mdc-button mdc-button--outlined">
-                                <span class="mdc-button__ripple"></span>
-                                <i class="material-icons mdc-button__icon">grid_on</i>
-                                <span class="mdc-button__label">Kalibruj</span>
-                            </button>
+                            <span id="gridStatus" class="mdc-typography--caption">Siatka: brak</span>
                         </div>
 
                         <div class="grid-manual">
+                            <h4 style="margin: 0 0 12px 0; font-size: 0.85rem; color: var(--text-secondary);">Automatyczne wyliczanie:</h4>
                             <div class="manual-inputs">
-                                <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense">
-                                    <span class="mdc-notched-outline">
-                                        <span class="mdc-notched-outline__leading"></span>
-                                        <span class="mdc-notched-outline__notch">
-                                            <span class="mdc-floating-label">Rozmiar</span>
-                                        </span>
-                                        <span class="mdc-notched-outline__trailing"></span>
-                                    </span>
-                                    <input type="number" id="gridSizeInput" min="1" class="mdc-text-field__input" />
-                                </label>
-                                <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense">
-                                    <span class="mdc-notched-outline">
-                                        <span class="mdc-notched-outline__leading"></span>
-                                        <span class="mdc-notched-outline__notch">
-                                            <span class="mdc-floating-label">Offset X</span>
-                                        </span>
-                                        <span class="mdc-notched-outline__trailing"></span>
-                                    </span>
-                                    <input type="number" id="gridOffsetXInput" class="mdc-text-field__input" />
-                                </label>
-                                <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--dense">
-                                    <span class="mdc-notched-outline">
-                                        <span class="mdc-notched-outline__leading"></span>
-                                        <span class="mdc-notched-outline__notch">
-                                            <span class="mdc-floating-label">Offset Y</span>
-                                        </span>
-                                        <span class="mdc-notched-outline__trailing"></span>
-                                    </span>
-                                    <input type="number" id="gridOffsetYInput" class="mdc-text-field__input" />
-                                </label>
+                                <div class="input-wrapper">
+                                    <label for="gridCountXInput">Kratek X:</label>
+                                    <input type="number" id="gridCountXInput" min="1" step="1" placeholder="np. 20" />
+                                </div>
+                                <div class="input-wrapper">
+                                    <label for="gridCountYInput">Kratek Y:</label>
+                                    <input type="number" id="gridCountYInput" min="1" step="1" placeholder="np. 15" />
+                                </div>
+                            </div>
+
+                            <h4 style="margin: 16px 0 12px 0; font-size: 0.85rem; color: var(--text-secondary);">Ręczna konfiguracja:</h4>
+                            <div class="manual-inputs">
+                                <div class="input-wrapper">
+                                    <label for="gridSizeInput">Rozmiar kratki:</label>
+                                    <input type="number" id="gridSizeInput" min="1" step="0.1" placeholder="px" />
+                                </div>
+                                <div class="input-wrapper">
+                                    <label for="gridOffsetXInput">Offset X:</label>
+                                    <input type="number" id="gridOffsetXInput" step="0.1" placeholder="px" />
+                                </div>
+                                <div class="input-wrapper">
+                                    <label for="gridOffsetYInput">Offset Y:</label>
+                                    <input type="number" id="gridOffsetYInput" step="0.1" placeholder="px" />
+                                </div>
+                                <div class="input-wrapper">
+                                    <label for="gridLineWidthInput">Grubość linii:</label>
+                                    <input type="number" id="gridLineWidthInput" step="0.1" min="0.1" max="10" value="1" />
+                                </div>
                             </div>
                             <div class="manual-actions">
                                 <button id="saveGridBtn" class="mdc-button mdc-button--raised">
@@ -286,7 +297,7 @@
                 <button id="setPreviewMapBtn" class="mdc-button mdc-button--outlined footer-btn">
                     <span class="mdc-button__ripple"></span>
                     <i class="material-icons mdc-button__icon">visibility</i>
-                    <span class="mdc-button__label">Ustaw podgląd</span>
+                    <span class="mdc-button__label">Wczytaj podgląd</span>
                 </button>
             </div>
         </div>

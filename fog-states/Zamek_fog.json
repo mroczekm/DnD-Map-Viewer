@@ -1,0 +1,4239 @@
+{
+  "mapName" : "Zamek",
+  "revealedAreas" : [ {
+    "x" : 307,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 307,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 307,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 307,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 1126,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 1126,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 1194,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 1194,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 1194,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 1058,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 1126,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 1194,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 1058,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 1126,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 1194,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 1058,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 1126,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 1194,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 1058,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 1126,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 1194,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 1058,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 1126,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 1194,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1467,
+    "y" : 1126,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1536,
+    "y" : 1126,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1740,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1809,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1809,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1809,
+    "y" : 989,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1672,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1740,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1809,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1877,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1877,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1877,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1740,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1809,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1877,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1945,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1945,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1945,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1809,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1877,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1945,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1809,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1877,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1945,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1740,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1740,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1672,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1672,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1672,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 996,
+    "y" : 335,
+    "radius" : 20,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1002,
+    "y" : 753,
+    "radius" : 20,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 443,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 443,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 443,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 511,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 580,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 170,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 648,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 170,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 170,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 170,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 716,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 170,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 170,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 170,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 785,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 170,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 170,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 170,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 170,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 170,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 170,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 170,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 170,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 238,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 307,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 375,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1467,
+    "y" : 443,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1467,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1467,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1467,
+    "y" : 512,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1467,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1467,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1467,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1467,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1467,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 580,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1399,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 648,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 716,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1331,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 785,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 989,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 989,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1262,
+    "y" : 989,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 989,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 989,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1194,
+    "y" : 989,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 989,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 989,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1126,
+    "y" : 989,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 989,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 989,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 1058,
+    "y" : 989,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 853,
+    "y" : 989,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 921,
+    "y" : 989,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 853,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 921,
+    "radius" : 34,
+    "isGridCell" : true
+  }, {
+    "x" : 989,
+    "y" : 989,
+    "radius" : 34,
+    "isGridCell" : true
+  } ]
+}

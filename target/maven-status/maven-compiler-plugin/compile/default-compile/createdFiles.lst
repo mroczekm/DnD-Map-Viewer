@@ -15,6 +15,7 @@ com\dnd\controller\MapFileController.class
 com\dnd\controller\GridController$GridConfigRequest.class
 com\dnd\controller\GridController.class
 com\dnd\controller\PreviewMapController.class
+com\dnd\config\MapConfiguration$GridConfigs.class
 com\dnd\config\MapConfiguration.class
 com\dnd\model\MapInfo.class
 com\dnd\controller\FogController$FogPoint.class

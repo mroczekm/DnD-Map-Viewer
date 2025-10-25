@@ -9,6 +9,7 @@ public class MapConfiguration {
 
     private Maps maps = new Maps();
     private FogStates fogStates = new FogStates();
+    private GridConfigs gridConfigs = new GridConfigs();
 
     public Maps getMaps() {
         return maps;
@@ -26,6 +27,14 @@ public class MapConfiguration {
         this.fogStates = fogStates;
     }
 
+    public GridConfigs getGridConfigs() {
+        return gridConfigs;
+    }
+
+    public void setGridConfigs(GridConfigs gridConfigs) {
+        this.gridConfigs = gridConfigs;
+    }
+
     public static class Maps {
         private String directory;
 
@@ -40,6 +49,18 @@ public class MapConfiguration {
 
     public static class FogStates {
         private String directory;
+
+        public String getDirectory() {
+            return directory;
+        }
+
+        public void setDirectory(String directory) {
+            this.directory = directory;
+        }
+    }
+
+    public static class GridConfigs {
+        private String directory = "grid-configs";
 
         public String getDirectory() {
             return directory;

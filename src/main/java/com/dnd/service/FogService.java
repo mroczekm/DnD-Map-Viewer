@@ -40,6 +40,17 @@ public class FogService {
             return state;
         } catch (IOException e) {
             System.err.println("Błąd odczytu stanu mgły dla mapy: " + mapName);
+            System.err.println("Szczegóły błędu: " + e.getMessage());
+            System.err.println("Rozmiar pliku: " + fogFile.length() + " bajtów");
+
+            // Jeśli plik jest za duży lub uszkodzony, utwórz backup i zacznij od nowa
+            if (fogFile.length() > 10_000_000) { // 10MB
+                System.err.println("Plik mgły jest za duży! Tworzenie backupu...");
+                File backup = new File(fogFile.getParent(), mapName + "_fog_backup_" + System.currentTimeMillis() + ".json");
+                fogFile.renameTo(backup);
+                System.err.println("Backup utworzony: " + backup.getName());
+            }
+
             return new FogState(mapName, new ArrayList<>());
         }
     }
@@ -48,9 +59,70 @@ public class FogService {
         File fogFile = getFogFile(fogState.getMapName());
 
         try {
-            objectMapper.writeValue(fogFile, fogState);
+            // Optymalizuj stan mgły przed zapisem
+            optimizeFogState(fogState);
+
+            // Upewnij się że katalog istnieje
+            File parentDir = fogFile.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs();
+            }
+
+            // Zapisz używając standardowej metody ObjectMapper
+            // Jest najbardziej niezawodna i nie wymaga dodatkowych walidacji
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(fogFile, fogState);
+
+            // Loguj sukces (bez walidacji która powodowała problemy)
+            System.out.println("Stan mgły zapisany pomyślnie dla mapy: " + fogState.getMapName() +
+                             " (punktów: " + fogState.getRevealedAreas().size() + " bajtów)");
+
         } catch (IOException e) {
+            System.err.println("Błąd zapisu stanu mgły dla mapy: " + fogState.getMapName());
+            System.err.println("Ścieżka pliku: " + fogFile.getAbsolutePath());
+            System.err.println("Szczegóły: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Nie można zapisać stanu mgły dla mapy: " + fogState.getMapName(), e);
+        }
+    }
+
+    private void optimizeFogState(FogState fogState) {
+        List<FogState.FogPoint> areas = fogState.getRevealedAreas();
+        if (areas == null || areas.isEmpty()) {
+            return;
+        }
+
+        // Jeśli lista jest za duża (powyżej 1000 punktów), usuń duplikaty i zmniejsz
+        if (areas.size() > 1000) {
+            System.out.println("Optymalizacja mgły dla mapy: " + fogState.getMapName() +
+                             " (punktów: " + areas.size() + ")");
+
+            // Usuń duplikaty - punkty w bardzo podobnej lokalizacji
+            List<FogState.FogPoint> optimized = new ArrayList<>();
+            for (FogState.FogPoint point : areas) {
+                boolean isDuplicate = optimized.stream().anyMatch(p ->
+                    Math.abs(p.getX() - point.getX()) < 3 &&
+                    Math.abs(p.getY() - point.getY()) < 3 &&
+                    Math.abs(p.getRadius() - point.getRadius()) < 3
+                );
+                if (!isDuplicate) {
+                    optimized.add(point);
+                }
+            }
+
+            fogState.setRevealedAreas(optimized);
+            System.out.println("Po optymalizacji: " + optimized.size() + " punktów");
+
+            // Jeśli nadal za dużo (powyżej 5000), weź tylko co N-ty punkt
+            if (optimized.size() > 5000) {
+                System.out.println("Nadal za dużo punktów, redukowanie...");
+                List<FogState.FogPoint> reduced = new ArrayList<>();
+                int step = optimized.size() / 5000 + 1;
+                for (int i = 0; i < optimized.size(); i += step) {
+                    reduced.add(optimized.get(i));
+                }
+                fogState.setRevealedAreas(reduced);
+                System.out.println("Po redukcji: " + reduced.size() + " punktów");
+            }
         }
     }
 
