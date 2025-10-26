@@ -891,10 +891,53 @@ class DnDMapViewer {
     }
 
     getMousePos(e){
-        const rect = this.fogCanvas.getBoundingClientRect();
-        const sx = this.fogCanvas.width / rect.width;
-        const sy = this.fogCanvas.height / rect.height;
-        return {x: (e.clientX - rect.left) * sx, y: (e.clientY - rect.top) * sy};
+        if (!this.currentMap) return {x: 0, y: 0};
+
+        // Pobierz pozycję kliknięcia względem kontenera
+        const containerRect = this.mapContainer.getBoundingClientRect();
+        let x = e.clientX - containerRect.left;
+        let y = e.clientY - containerRect.top;
+
+        // CSS Transform: translate(panOffset) scale(zoom) rotate(angle)
+        // Transform-origin: (containerWidth/2, containerHeight/2) - w przestrzeni WRAPPER przed transformacją
+
+        // Matematyka CSS transforms:
+        // Finalna pozycja = translate + transformOrigin + rotate(scale(point - transformOrigin))
+        // Odwracamy: point = inverse_rotate(inverse_scale(finalPos - translate - transformOrigin)) + transformOrigin
+
+        const containerWidth = this.mapContainer.clientWidth;
+        const containerHeight = this.mapContainer.clientHeight;
+        const originX = containerWidth / 2;
+        const originY = containerHeight / 2;
+
+        // 1. Odejmij translate
+        x -= this.panOffset.x;
+        y -= this.panOffset.y;
+
+        // 2. Przesuń do transform-origin
+        x -= originX;
+        y -= originY;
+
+        // 3. Odwróć rotate
+        if (this.rotation !== 0) {
+            const angle = -this.rotation * Math.PI / 180;
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+            const rotatedX = x * cos - y * sin;
+            const rotatedY = x * sin + y * cos;
+            x = rotatedX;
+            y = rotatedY;
+        }
+
+        // 4. Odwróć scale
+        x /= this.zoom;
+        y /= this.zoom;
+
+        // 5. Przesuń z powrotem od transform-origin
+        x += originX;
+        y += originY;
+
+        return {x, y};
     }
 
     getGridCell(x, y){
@@ -915,8 +958,9 @@ class DnDMapViewer {
         const cellX = cellIndexX * this.gridSize + this.gridOffsetX;
         const cellY = cellIndexY * this.gridSize + this.gridOffsetY;
 
-        // Sprawdź czy kratka mieści się w granicach mapy
-        if(cellX >= this.currentMap.width || cellY >= this.currentMap.height) {
+        // Sprawdź czy kliknięcie jest w granicach mapy (nie kratka, bo kratka może wykraczać)
+        // Akceptuj kratkę jeśli kliknięcie jest w mapie, nawet jeśli kratka częściowo wykracza
+        if(x >= this.currentMap.width || y >= this.currentMap.height) {
             return null;
         }
 
@@ -1759,21 +1803,27 @@ class DnDMapViewer {
     // ===== MODUŁ POSTACI =====
 
     toggleCharacterMode(mode) {
+        // Wyłącz wszystkie tryby najpierw
+        this.addPlayerBtn.classList.remove('active');
+        this.addEnemyBtn.classList.remove('active');
+        this.removeCharacterBtn.classList.remove('active');
+
         if (this.characterMode === mode) {
-            // Wyłącz tryb
+            // Wyłącz tryb (już usunięte klasy powyżej)
             this.characterMode = null;
-            this.addPlayerBtn.classList.remove('active');
-            this.addEnemyBtn.classList.remove('active');
-            this.removeCharacterBtn.classList.remove('active');
-            this.updateCursor();
         } else {
-            // Włącz tryb
+            // Włącz nowy tryb
             this.characterMode = mode;
-            this.addPlayerBtn.classList.toggle('active', mode === 'player');
-            this.addEnemyBtn.classList.toggle('active', mode === 'enemy');
-            this.removeCharacterBtn.classList.toggle('active', mode === 'remove');
-            this.updateCursor();
+            if (mode === 'player') {
+                this.addPlayerBtn.classList.add('active');
+            } else if (mode === 'enemy') {
+                this.addEnemyBtn.classList.add('active');
+            } else if (mode === 'remove') {
+                this.removeCharacterBtn.classList.add('active');
+            }
         }
+
+        this.updateCursor();
     }
 
     handleCharacterClick(e) {
@@ -2289,23 +2339,20 @@ class DnDMapViewer {
             return `rgba(${r}, ${g}, ${b}, ${alpha})`;
         };
 
-        // Narysuj ramkę viewportu uwzględniając obrót
+        // Narysuj ramkę viewportu
         const vp = this.previewViewport;
 
-        this.previewViewportCtx.save();
-
-        // Jeśli jest obrót, zastosuj go do rysowania ramki
-        if (vp.rotation && vp.rotation !== 0) {
-            // Przesuń kontekst do środka viewportu
-            const centerX = vp.x + vp.width / 2;
-            const centerY = vp.y + vp.height / 2;
-            this.previewViewportCtx.translate(centerX, centerY);
-            this.previewViewportCtx.rotate((vp.rotation * Math.PI) / 180);
-            this.previewViewportCtx.translate(-centerX, -centerY);
-        }
-
+        // Rysuj prostokąt - może wykraczać poza granice obrazu
         this.previewViewportCtx.strokeStyle = hexToRgba(this.previewViewportColor, 0.9);
         this.previewViewportCtx.lineWidth = 4;
+
+        // Rysuj ramkę nawet jeśli wykracza poza canvas
+        // Ustaw clipping aby nie rysować poza canvas
+        this.previewViewportCtx.save();
+        this.previewViewportCtx.beginPath();
+        this.previewViewportCtx.rect(0, 0, this.currentMap.width, this.currentMap.height);
+        this.previewViewportCtx.clip();
+
         this.previewViewportCtx.strokeRect(vp.x, vp.y, vp.width, vp.height);
 
         this.previewViewportCtx.restore();

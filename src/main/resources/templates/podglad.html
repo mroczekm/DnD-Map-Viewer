@@ -89,28 +89,31 @@
         function updateTransform() {
             if (!mapImage.complete) return;
 
-            // Oblicz pozycję wrapper - chcemy żeby środek obrazu był w środku ekranu + pan
             const containerWidth = mapContainer.clientWidth;
             const containerHeight = mapContainer.clientHeight;
             const imageWidth = mapImage.naturalWidth;
             const imageHeight = mapImage.naturalHeight;
 
-            // Środek obrazu ma być w (containerWidth/2 + panX, containerHeight/2 + panY)
-            // Więc lewy górny róg obrazu (który jest w pozycji 0,0 w wrapper) musi być w:
-            const wrapperX = containerWidth / 2 + panX - (imageWidth * zoom) / 2;
-            const wrapperY = containerHeight / 2 + panY - (imageHeight * zoom) / 2;
+            // Pozycjonuj wrapper tak aby obraz był wycentrowany
+            // Lewy górny róg wrapper powinien być w:
+            const wrapperLeft = (containerWidth - imageWidth) / 2;
+            const wrapperTop = (containerHeight - imageHeight) / 2;
 
-            // Zastosuj transformacje
+            mapWrapper.style.left = wrapperLeft + 'px';
+            mapWrapper.style.top = wrapperTop + 'px';
+
+            // WAŻNE: Transform-origin ZAWSZE na środku kontenera WZGLĘDEM WRAPPER
+            // czyli (containerWidth/2 - wrapperLeft, containerHeight/2 - wrapperTop)
+            const originX = containerWidth / 2 - wrapperLeft;
+            const originY = containerHeight / 2 - wrapperTop;
+            mapWrapper.style.transformOrigin = `${originX}px ${originY}px`;
+
+            // Zastosuj transformacje: translate, scale, rotate (jak w app.js)
             const transforms = [];
-            transforms.push(`translate(${wrapperX}px, ${wrapperY}px)`);
+            transforms.push(`translate(${panX}px, ${panY}px)`);
             transforms.push(`scale(${zoom})`);
-
             if (rotation !== 0) {
-                // Dla obrotu musimy zmienić transform-origin na środek obrazu
-                mapWrapper.style.transformOrigin = `${imageWidth / 2}px ${imageHeight / 2}px`;
                 transforms.push(`rotate(${rotation}deg)`);
-            } else {
-                mapWrapper.style.transformOrigin = '0 0';
             }
 
             mapWrapper.style.transform = transforms.join(' ');
@@ -189,38 +192,71 @@
             const imageWidth = mapImage.naturalWidth;
             const imageHeight = mapImage.naturalHeight;
 
-            // Wrapper jest w pozycji tak, że lewy górny róg obrazu jest w:
-            // wrapperX = containerWidth/2 + panX - (imageWidth * zoom) / 2
-            // wrapperY = containerHeight/2 + panY - (imageHeight * zoom) / 2
+            // Pozycja wrapper
+            const wrapperLeft = (containerWidth - imageWidth) / 2;
+            const wrapperTop = (containerHeight - imageHeight) / 2;
 
-            const wrapperX = containerWidth / 2 + panX - (imageWidth * zoom) / 2;
-            const wrapperY = containerHeight / 2 + panY - (imageHeight * zoom) / 2;
+            // Transform-origin względem wrapper
+            const originX = containerWidth / 2 - wrapperLeft;
+            const originY = containerHeight / 2 - wrapperTop;
 
-            // Lewy górny róg widocznego obszaru ekranu to (0, 0)
-            // Offset widocznego obszaru względem obrazu (w pikselach ekranu po zoom):
-            const offsetX = 0 - wrapperX;
-            const offsetY = 0 - wrapperY;
+            // Oblicz pozycje rogów ekranu w układzie obrazu
+            // Używamy tej samej logiki odwracania co w getMousePos w app.js
 
-            // Przelicz na piksele oryginału obrazu (przed zoom):
-            const visibleLeft = offsetX / zoom;
-            const visibleTop = offsetY / zoom;
-            const visibleWidth = containerWidth / zoom;
-            const visibleHeight = containerHeight / zoom;
+            function screenToImage(screenX, screenY) {
+                // screenX, screenY są względem kontenera
+                // Przekształć na współrzędne względem wrapper
+                let x = screenX - wrapperLeft;
+                let y = screenY - wrapperTop;
 
-            console.log('Viewport Debug:', {
-                panX, panY, zoom,
-                containerWidth, containerHeight,
-                imageWidth, imageHeight,
-                wrapperX, wrapperY,
-                offsetX, offsetY,
-                visibleLeft, visibleTop, visibleWidth, visibleHeight
-            });
+                // 1. Odejmij translate
+                x -= panX;
+                y -= panY;
+
+                // 2. Przesuń do transform-origin
+                x -= originX;
+                y -= originY;
+
+                // 3. Odwróć rotate
+                if (rotation !== 0) {
+                    const angle = -rotation * Math.PI / 180;
+                    const cos = Math.cos(angle);
+                    const sin = Math.sin(angle);
+                    const rotatedX = x * cos - y * sin;
+                    const rotatedY = x * sin + y * cos;
+                    x = rotatedX;
+                    y = rotatedY;
+                }
+
+                // 4. Odwróć scale
+                x /= zoom;
+                y /= zoom;
+
+                // 5. Przesuń z powrotem od transform-origin
+                x += originX;
+                y += originY;
+
+                // Teraz x, y są współrzędnymi na obrazie
+                return { x, y };
+            }
+
+            // Oblicz 4 rogi ekranu w układzie obrazu
+            const topLeft = screenToImage(0, 0);
+            const topRight = screenToImage(containerWidth, 0);
+            const bottomLeft = screenToImage(0, containerHeight);
+            const bottomRight = screenToImage(containerWidth, containerHeight);
+
+            // Znajdź bounding box wszystkich rogów
+            const minX = Math.min(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x);
+            const maxX = Math.max(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x);
+            const minY = Math.min(topLeft.y, topRight.y, bottomLeft.y, bottomRight.y);
+            const maxY = Math.max(topLeft.y, topRight.y, bottomLeft.y, bottomRight.y);
 
             const viewport = {
-                x: visibleLeft,
-                y: visibleTop,
-                width: visibleWidth,
-                height: visibleHeight,
+                x: Math.max(0, minX),
+                y: Math.max(0, minY),
+                width: Math.min(maxX - minX, imageWidth),
+                height: Math.min(maxY - minY, imageHeight),
                 zoom: zoom,
                 rotation: rotation,
                 mapWidth: imageWidth,
@@ -256,7 +292,23 @@
                     mapInfo = data;
                     mapImage.src = `/api/map-files/${mapInfo.filename}`;
                     mapImage.onload = () => {
-                        // Wycentruj mapę i zgłoś viewport
+                        // Wycentruj mapę - oblicz pan aby środek obrazu był w środku ekranu
+                        const containerWidth = mapContainer.clientWidth;
+                        const containerHeight = mapContainer.clientHeight;
+                        const imageWidth = mapImage.naturalWidth;
+                        const imageHeight = mapImage.naturalHeight;
+
+                        // Początkowy pan - środek kontenera to transform-origin,
+                        // więc aby wycentrować obraz o rozmiarze (imageWidth, imageHeight):
+                        // Środek obrazu w przestrzeni wrapper to (imageWidth/2, imageHeight/2)
+                        // Chcemy żeby był w środku kontenera (containerWidth/2, containerHeight/2)
+                        // Więc: (containerWidth/2, containerHeight/2) = transformOrigin + pan/zoom
+                        // Pan = (containerWidth/2 - imageWidth/2) * zoom (dla zoom=1)
+                        panX = 0; // Resetuj pan - będzie sterowany przyciskami
+                        panY = 0;
+                        zoom = 1;
+                        rotation = 0;
+
                         updateTransform();
                         renderFog();
                     };
