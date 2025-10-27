@@ -118,6 +118,9 @@
 
             mapWrapper.style.transform = transforms.join(' ');
             reportViewport();
+
+            // Przerysuj postacie gdy zmienia się rotacja
+            drawCharacters();
         }
 
         // Funkcja do pobierania poleceń nawigacji z serwera
@@ -374,7 +377,7 @@
             // Wyczyść canvas
             charactersCtx.clearRect(0, 0, charactersLayer.width, charactersLayer.height);
 
-            // Rysuj graczy (okręgi)
+            // Rysuj graczy (okręgi) - bez rotacji, okręgi wyglądają tak samo
             charactersCtx.strokeStyle = playerColor;
             charactersCtx.fillStyle = playerColor + '40'; // 25% opacity
             charactersCtx.lineWidth = 3;
@@ -390,7 +393,7 @@
                 charactersCtx.stroke();
             });
 
-            // Rysuj wrogów (litery)
+            // Rysuj wrogów (litery) - Z ROTACJĄ
             charactersCtx.fillStyle = enemyColor;
             charactersCtx.font = `bold ${gridSize * 0.6}px Arial`;
             charactersCtx.textAlign = 'center';
@@ -400,7 +403,21 @@
                 const centerX = enemy.x + gridSize / 2;
                 const centerY = enemy.y + gridSize / 2;
 
-                charactersCtx.fillText(enemy.letter, centerX, centerY);
+                charactersCtx.save();
+
+                // Przesuń do środka litery
+                charactersCtx.translate(centerX, centerY);
+
+                // Obróć literę w PRZECIWNYM kierunku niż mapa, aby była zawsze czytelna
+                // Jeśli mapa obrócona o 90°, literka o -90° = czytelna
+                if (rotation !== 0) {
+                    charactersCtx.rotate((-rotation * Math.PI) / 180);
+                }
+
+                // Narysuj literę w środku (0, 0)
+                charactersCtx.fillText(enemy.letter, 0, 0);
+
+                charactersCtx.restore();
             });
         }
 

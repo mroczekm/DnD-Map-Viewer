@@ -1,0 +1,13 @@
+# Docker ignore
+target/
+!target/*.jar
+.mvn/
+.git/
+.gitignore
+*.md
+HELP.md
+mvnw
+mvnw.cmd
+.idea/
+*.iml
+

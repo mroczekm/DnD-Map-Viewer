@@ -17,14 +17,13 @@ public class CharacterService {
 
     private final MapConfiguration mapConfiguration;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final String CHARACTER_DIR = "characters";
 
     @Autowired
     public CharacterService(MapConfiguration mapConfiguration) {
         this.mapConfiguration = mapConfiguration;
 
         // Utwórz katalog na postacie jeśli nie istnieje
-        File dir = new File(CHARACTER_DIR);
+        File dir = new File(mapConfiguration.getCharacters().getDirectory());
         if (!dir.exists()) {
             dir.mkdirs();
         }
@@ -32,7 +31,8 @@ public class CharacterService {
 
     public void saveCharacters(String mapName, CharacterData data) {
         try {
-            File file = new File(CHARACTER_DIR, mapName + "_characters.json");
+            String charactersDir = mapConfiguration.getCharacters().getDirectory();
+            File file = new File(charactersDir, mapName + "_characters.json");
             objectMapper.writeValue(file, data);
             System.out.println("Zapisano postacie dla mapy: " + mapName);
         } catch (IOException e) {
@@ -42,7 +42,8 @@ public class CharacterService {
 
     public CharacterData loadCharacters(String mapName) {
         try {
-            File file = new File(CHARACTER_DIR, mapName + "_characters.json");
+            String charactersDir = mapConfiguration.getCharacters().getDirectory();
+            File file = new File(charactersDir, mapName + "_characters.json");
             if (file.exists()) {
                 return objectMapper.readValue(file, CharacterData.class);
             }
@@ -54,7 +55,8 @@ public class CharacterService {
 
     public void deleteCharacters(String mapName) {
         try {
-            File file = new File(CHARACTER_DIR, mapName + "_characters.json");
+            String charactersDir = mapConfiguration.getCharacters().getDirectory();
+            File file = new File(charactersDir, mapName + "_characters.json");
             if (file.exists()) {
                 file.delete();
                 System.out.println("Usunięto postacie dla mapy: " + mapName);

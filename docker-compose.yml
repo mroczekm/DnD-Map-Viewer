@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  dnd-app:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      # JEDEN katalog dla wszystkich danych - łatwo zmapować w Docker
+      - ./data:/app/data
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      # Ścieżki do podkatalogów w /app/data
+      - DND_MAPS_DIR=/app/data/DnD
+      - DND_FOG_DIR=/app/data/fog-states
+      - DND_GRID_DIR=/app/data/grid-configs
+      - DND_CHARACTERS_DIR=/app/data/characters
+      - DND_SETTINGS_DIR=/app/data/settings
+    restart: unless-stopped
+
+# Wszystkie dane w JEDNYM katalogu ./data:
+# ./data/
+#   ├── DnD/              - obrazy map (*.jpg, *.png)
+#   ├── fog-states/       - stany mgły (*.json)
+#   ├── grid-configs/     - konfiguracje siatki (*_grid.json)
+#   ├── characters/       - postacie (*_characters.json)
+#   └── settings/         - ustawienia (*_settings.json)
+#
+# Backup: tar -czf backup.tar.gz ./data
+# Restore: tar -xzf backup.tar.gz
+

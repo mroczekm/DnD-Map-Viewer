@@ -16,13 +16,13 @@ public class ViewController {
         this.mapService = mapService;
     }
 
-    @GetMapping("/")
+    @GetMapping("/gm")
     public String index(Model model) {
         model.addAttribute("maps", mapService.getAllMaps());
         return "index";
     }
 
-    @GetMapping("/podglad")
+    @GetMapping("/view")
     public String podglad(Model model) {
         model.addAttribute("maps", mapService.getAllMaps());
         return "podglad";

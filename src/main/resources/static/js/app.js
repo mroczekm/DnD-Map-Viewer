@@ -59,12 +59,50 @@ class DnDMapViewer {
         this.enemyLetterCounter = 0;
         this.isShiftPressed = false; // Śledzenie klawisza Shift
 
+        // Automatyczny zapis co 30 sekund
+        this.autoSaveInterval = null;
+
         // Wyczyść stare dane mgły z localStorage (nie są już używane)
         this.clearOldFogDataFromLocalStorage();
 
         this.initElements();
         this.initEvents();
         this.startViewportPolling();
+        this.startAutoSave(); // Uruchom automatyczny zapis
+    }
+
+    startAutoSave() {
+        // Zapisuj wszystkie ustawienia co 30 sekund
+        if (this.autoSaveInterval) {
+            clearInterval(this.autoSaveInterval);
+        }
+
+        this.autoSaveInterval = setInterval(() => {
+            this.autoSaveAllSettings();
+        }, 30000); // 30 sekund
+
+        console.log('🔄 Automatyczny zapis uruchomiony (co 30s)');
+    }
+
+    async autoSaveAllSettings() {
+        if (!this.currentMap) return;
+
+        try {
+            // 1. Zapisz ustawienia mapy (zoom, pan, kolory, etc.)
+            await this.saveMapSettings();
+
+            // 2. Zapisz mgłę (jeśli są zmiany)
+            if (this.pendingFogPoints.length > 0) {
+                await this.saveFogState();
+            }
+
+            // 3. Zapisz postacie
+            await this.saveCharacters();
+
+            console.log('✅ Auto-save completed for', this.currentMap.name);
+        } catch (error) {
+            console.error('❌ Auto-save error:', error);
+        }
     }
 
     clearOldFogDataFromLocalStorage() {
@@ -943,26 +981,32 @@ class DnDMapViewer {
     getGridCell(x, y){
         if(!this.gridSize) return null;
 
-        // Uwzględnij offset przy wyliczaniu pozycji kratki
-        const ax = x - this.gridOffsetX;
-        const ay = y - this.gridOffsetY;
+        // Dodaj margines tolerancji dla błędów zaokrągleń przy krawędziach (5px)
+        const EDGE_TOLERANCE = 5;
 
-        // Jeśli kliknięcie jest przed offsetem, zwróć null (poza siatką)
-        if(ax < 0 || ay < 0) return null;
+        // Przytnij współrzędne do granic mapy z tolerancją
+        const clampedX = Math.max(0, Math.min(x, this.currentMap.width - 0.01));
+        const clampedY = Math.max(0, Math.min(y, this.currentMap.height - 0.01));
 
-        // Wylicz indeks kratki
-        const cellIndexX = Math.floor(ax / this.gridSize);
-        const cellIndexY = Math.floor(ay / this.gridSize);
+        // Sprawdź czy kliknięcie jest w granicach mapy (z tolerancją dla krawędzi)
+        if(x < -EDGE_TOLERANCE || y < -EDGE_TOLERANCE ||
+           x > this.currentMap.width + EDGE_TOLERANCE ||
+           y > this.currentMap.height + EDGE_TOLERANCE) {
+            return null;
+        }
+
+        // Uwzględnij offset przy wyliczaniu pozycji kratki (użyj przyciętych współrzędnych)
+        const ax = clampedX - this.gridOffsetX;
+        const ay = clampedY - this.gridOffsetY;
+
+        // Jeśli kliknięcie jest przed offsetem ale w mapie, użyj pierwszej kratki
+        const cellIndexX = ax < 0 ? 0 : Math.floor(ax / this.gridSize);
+        const cellIndexY = ay < 0 ? 0 : Math.floor(ay / this.gridSize);
 
         // Wylicz pozycję kratki (lewy górny róg)
         const cellX = cellIndexX * this.gridSize + this.gridOffsetX;
         const cellY = cellIndexY * this.gridSize + this.gridOffsetY;
 
-        // Sprawdź czy kliknięcie jest w granicach mapy (nie kratka, bo kratka może wykraczać)
-        // Akceptuj kratkę jeśli kliknięcie jest w mapie, nawet jeśli kratka częściowo wykracza
-        if(x >= this.currentMap.width || y >= this.currentMap.height) {
-            return null;
-        }
 
         return { x: cellX, y: cellY };
     }
@@ -1755,6 +1799,7 @@ class DnDMapViewer {
         this.rotation = (this.rotation + degrees + 360) % 360;
         this.updateRotationDisplay();
         this.applyTransform();
+        this.drawCharacters(); // Przerysuj postacie z nową rotacją
         this.saveMapSettings();
         // Wyślij polecenie obrotu do podglądu
         this.sendRotationToPreview();
@@ -1764,6 +1809,7 @@ class DnDMapViewer {
         this.rotation = 0;
         this.updateRotationDisplay();
         this.applyTransform();
+        this.drawCharacters(); // Przerysuj postacie z nową rotacją
         this.saveMapSettings();
         // Wyślij polecenie obrotu do podglądu
         this.sendRotationToPreview();
@@ -2051,7 +2097,7 @@ class DnDMapViewer {
         // Wyczyść canvas
         this.charactersCtx.clearRect(0, 0, this.charactersCanvas.width, this.charactersCanvas.height);
 
-        // Rysuj graczy (okręgi)
+        // Rysuj graczy (okręgi) - bez rotacji, okręgi wyglądają tak samo
         this.charactersCtx.strokeStyle = this.playerColor;
         this.charactersCtx.fillStyle = this.playerColor + '40'; // 25% opacity
         this.charactersCtx.lineWidth = 3;
@@ -2067,7 +2113,7 @@ class DnDMapViewer {
             this.charactersCtx.stroke();
         });
 
-        // Rysuj wrogów (litery)
+        // Rysuj wrogów (litery) - Z ROTACJĄ
         this.charactersCtx.fillStyle = this.enemyColor;
         this.charactersCtx.font = `bold ${this.gridSize * 0.6}px Arial`;
         this.charactersCtx.textAlign = 'center';
@@ -2077,7 +2123,21 @@ class DnDMapViewer {
             const centerX = enemy.x + this.gridSize / 2;
             const centerY = enemy.y + this.gridSize / 2;
 
-            this.charactersCtx.fillText(enemy.letter, centerX, centerY);
+            this.charactersCtx.save();
+
+            // Przesuń do środka litery
+            this.charactersCtx.translate(centerX, centerY);
+
+            // Obróć literę w PRZECIWNYM kierunku niż mapa, aby była zawsze czytelna
+            // Jeśli mapa obrócona o 90°, literka o -90° = czytelna
+            if (this.rotation !== 0) {
+                this.charactersCtx.rotate((-this.rotation * Math.PI) / 180);
+            }
+
+            // Narysuj literę w środku (0, 0)
+            this.charactersCtx.fillText(enemy.letter, 0, 0);
+
+            this.charactersCtx.restore();
         });
     }
 
@@ -2161,7 +2221,7 @@ class DnDMapViewer {
     // ===== KONIEC MODUŁU POSTACI =====
 
     // Metody zapisywania i wczytywania ustawień mapy
-    saveMapSettings() {
+    async saveMapSettings() {
         if (!this.currentMap) return;
 
         const settings = {
@@ -2176,17 +2236,35 @@ class DnDMapViewer {
             gridVisible: this.gridVisible
         };
 
-        localStorage.setItem(`map_settings_${this.currentMap.name}`, JSON.stringify(settings));
+        try {
+            const response = await fetch(`/api/map-settings/${this.currentMap.name}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(settings)
+            });
+
+            if (!response.ok) {
+                console.error('Błąd zapisu ustawień mapy');
+            }
+        } catch (error) {
+            console.error('Błąd zapisu ustawień mapy:', error);
+        }
     }
 
-    loadMapSettings() {
+    async loadMapSettings() {
         if (!this.currentMap) return;
 
-        const savedSettings = localStorage.getItem(`map_settings_${this.currentMap.name}`);
-        if (!savedSettings) return;
-
         try {
-            const settings = JSON.parse(savedSettings);
+            const response = await fetch(`/api/map-settings/${this.currentMap.name}`);
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    console.log('Brak zapisanych ustawień dla mapy:', this.currentMap.name);
+                }
+                return;
+            }
+
+            const settings = await response.json();
 
             // Przywróć ustawienia
             if (settings.rotation !== undefined) {

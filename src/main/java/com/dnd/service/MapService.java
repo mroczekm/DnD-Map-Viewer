@@ -123,14 +123,22 @@ public class MapService {
         Path mapPath = Paths.get(mapConfiguration.getMaps().getDirectory(), map.getFilename());
         Files.deleteIfExists(mapPath);
 
-        // Usuń powiązane pliki (fog state, grid config, etc.)
+        // Usuń powiązane pliki (fog state, grid config, characters, settings)
         String fogStateFilename = mapName + ".json";
         Path fogStatePath = Paths.get(mapConfiguration.getFogStates().getDirectory(), fogStateFilename);
         Files.deleteIfExists(fogStatePath);
 
         // Usuń grid config
-        Path gridConfigPath = Paths.get("grid-configs", mapName + "_grid.json");
+        Path gridConfigPath = Paths.get(mapConfiguration.getGridConfigs().getDirectory(), mapName + "_grid.json");
         Files.deleteIfExists(gridConfigPath);
+
+        // Usuń characters
+        Path charactersPath = Paths.get(mapConfiguration.getCharacters().getDirectory(), mapName + "_characters.json");
+        Files.deleteIfExists(charactersPath);
+
+        // Usuń settings
+        Path settingsPath = Paths.get(mapConfiguration.getSettings().getDirectory(), mapName + "_settings.json");
+        Files.deleteIfExists(settingsPath);
 
         return true;
     }
