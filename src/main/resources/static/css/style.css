@@ -610,6 +610,18 @@ body {
     pointer-events: none;
 }
 
+/* Viewport overlay canvas - pokazuje obszar widziany przez graczy */
+#viewportOverlayCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 8;
+    pointer-events: none;
+    opacity: 0.8;
+
+}
+
+
 /* Left Controls (Navigation and Zoom) */
 .left-controls {
     position: absolute;
@@ -667,6 +679,152 @@ body {
     min-width: 60px;
     text-align: center;
     box-shadow: var(--elevation-1);
+}
+
+.zoom-level-input {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 8px 4px;
+    font-size: 12px;
+    font-weight: 500;
+    width: 45px;
+    text-align: center;
+    box-shadow: var(--elevation-1);
+    font-family: 'Courier New', monospace;
+}
+
+.zoom-level-input:focus {
+    outline: none;
+    border-color: var(--mdc-theme-primary);
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+
+.zoom-percent {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    width: 15px;
+}
+
+/* Precise Zoom Controls - prawy dolny róg */
+.precise-zoom-controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: var(--elevation-3);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    background: rgba(30, 30, 30, 0.95);
+}
+
+.zoom-title {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.zoom-input-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-primary);
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.zoom-input {
+    width: 45px;
+    background: transparent;
+    color: var(--text-primary);
+    border: none;
+    padding: 4px 2px;
+    font-size: 12px;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+}
+
+.zoom-input:focus {
+    outline: none;
+    background: rgba(25, 118, 210, 0.1);
+    border-radius: 4px;
+}
+
+.zoom-unit {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    font-weight: 600;
+    width: 12px;
+}
+
+.zoom-precise-btn {
+    width: 28px;
+    height: 28px;
+    background: var(--mdc-theme-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);
+}
+
+.zoom-precise-btn:hover {
+    background: #1565c0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.4);
+}
+
+.zoom-precise-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(25, 118, 210, 0.3);
+}
+
+.zoom-presets {
+    display: flex;
+    gap: 4px;
+    margin-top: 2px;
+}
+
+.zoom-preset-btn {
+    width: 32px;
+    height: 20px;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 9px;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.zoom-preset-btn:hover {
+    background: var(--mdc-theme-primary);
+    color: white;
+    border-color: var(--mdc-theme-primary);
+    transform: translateY(-1px);
 }
 
 /* Status Bar */
@@ -893,6 +1051,56 @@ body {
 
 .footer-btn .mdc-button__icon {
     margin-right: 8px;
+}
+
+/* Preview Control Section Styles */
+.preview-control-section {
+    margin-top: 12px;
+    padding: 12px 0;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.preview-btn {
+    width: 100%;
+    height: 36px;
+    border: 1px solid var(--mdc-theme-primary) !important;
+    color: var(--mdc-theme-primary) !important;
+    background: transparent !important;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+}
+
+.preview-btn:hover {
+    background: rgba(25, 118, 210, 0.1) !important;
+    border-color: var(--mdc-theme-primary) !important;
+}
+
+.preview-btn .mdc-button__icon {
+    margin-right: 6px;
+}
+
+/* Version Info Styles */
+.version-info {
+    margin-top: 8px;
+    padding: 6px 0;
+    border-top: 1px solid var(--border-color);
+}
+
+.version-compact {
+    font-size: 0.65rem;
+    color: var(--text-tertiary);
+    text-align: center;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.version-value {
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
 }
 
 /* View Controls */

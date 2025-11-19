@@ -37,8 +37,6 @@ public class MapSettingsService {
         File file = new File(settingsDir, fileName);
 
         objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, settings);
-
-        System.out.println("Zapisano ustawienia mapy: " + mapName + " do pliku: " + file.getAbsolutePath());
     }
 
     public MapSettings loadMapSettings(String mapName) {
@@ -48,13 +46,10 @@ public class MapSettingsService {
             File file = new File(settingsDir, fileName);
 
             if (!file.exists()) {
-                System.out.println("Brak zapisanych ustawień dla mapy: " + mapName);
                 return null;
             }
 
-            MapSettings settings = objectMapper.readValue(file, MapSettings.class);
-            System.out.println("Wczytano ustawienia mapy: " + mapName);
-            return settings;
+            return objectMapper.readValue(file, MapSettings.class);
 
         } catch (IOException e) {
             System.err.println("Błąd wczytywania ustawień mapy " + mapName + ": " + e.getMessage());
@@ -70,8 +65,8 @@ public class MapSettingsService {
 
             if (file.exists()) {
                 boolean deleted = file.delete();
-                if (deleted) {
-                    System.out.println("Usunięto ustawienia mapy: " + mapName);
+                if (file.exists() && file.delete()) {
+                    // Usunięto log
                 }
                 return deleted;
             }

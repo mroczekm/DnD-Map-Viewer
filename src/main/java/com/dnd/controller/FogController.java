@@ -2,6 +2,7 @@ package com.dnd.controller;
 
 import com.dnd.model.FogState;
 import com.dnd.service.FogService;
+import com.dnd.service.PreviewMapService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,15 +15,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class FogController {
 
     private final FogService fogService;
+    private final PreviewMapService previewMapService;
 
     @Autowired
-    public FogController(FogService fogService) {
+    public FogController(FogService fogService, PreviewMapService previewMapService) {
         this.fogService = fogService;
+        this.previewMapService = previewMapService;
     }
 
     @GetMapping("/{mapName}")
     public ResponseEntity<FogState> getFogState(@PathVariable String mapName) {
         FogState fogState = fogService.getFogState(mapName);
+
+        // ZAWSZE loguj żeby zobaczyć dokładnie co podgląd pobiera
+        System.out.println("📡 PODGLĄD POBIERA: " + mapName + " → " +
+            fogState.getRevealedAreas().size() + " obszarów mgły");
+
         return ResponseEntity.ok(fogState);
     }
 
@@ -34,6 +42,12 @@ public class FogController {
             @RequestParam(defaultValue = "50") int radius) {
 
         fogService.addRevealedArea(mapName, x, y, radius);
+
+        // Natychmiastowe odświeżenie podglądu po zmianie mgły
+        if (mapName.equals(previewMapService.getPreviewMapName())) {
+            previewMapService.requestRefresh();
+        }
+
         return ResponseEntity.ok().build();
     }
 
@@ -43,6 +57,12 @@ public class FogController {
             @RequestBody List<FogPoint> points) {
 
         fogService.addRevealedAreas(mapName, points);
+
+        // PROSTY refresh request - podgląd pobierze mgłę w swoim polling
+        if (mapName.equals(previewMapService.getPreviewMapName())) {
+            previewMapService.requestRefresh();
+        }
+
         return ResponseEntity.ok().build();
     }
 
@@ -52,6 +72,12 @@ public class FogController {
             @RequestBody List<FogPoint> points) {
 
         fogService.removeRevealedAreas(mapName, points);
+
+        // PROSTY refresh request - podgląd pobierze mgłę w swoim polling
+        if (mapName.equals(previewMapService.getPreviewMapName())) {
+            previewMapService.requestRefresh();
+        }
+
         return ResponseEntity.ok().build();
     }
 
@@ -103,5 +129,36 @@ public class FogController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @PostMapping("/{mapName}/batch")
+    public ResponseEntity<Void> processBatch(
+            @PathVariable String mapName,
+            @RequestBody List<BatchFogPoint> points) {
+        try {
+            for (BatchFogPoint point : points) {
+                if ("erase".equals(point.getAction())) {
+                    fogService.revealFogPoint(mapName, point.getX(), point.getY(), point.getRadius(), point.isGridCell());
+                } else if ("paint".equals(point.getAction())) {
+                    // For paint action, we need to remove revealed areas
+                    FogPoint pointToRemove = new FogPoint(point.getX(), point.getY(), point.getRadius());
+                    pointToRemove.setGridCell(point.isGridCell());
+                    List<FogPoint> pointsToRemove = List.of(pointToRemove);
+                    fogService.removeRevealedAreas(mapName, pointsToRemove);
+                }
+            }
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    public static class BatchFogPoint extends FogPoint {
+        private String action;
+
+        public BatchFogPoint() {}
+
+        public String getAction() { return action; }
+        public void setAction(String action) { this.action = action; }
     }
 }

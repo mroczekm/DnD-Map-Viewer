@@ -59,5 +59,24 @@ public class MapSettings {
 
     public Boolean getGridVisible() { return gridVisible; }
     public void setGridVisible(Boolean gridVisible) { this.gridVisible = gridVisible; }
+
+    // Kompatybilność z starym formatem panX/panY (dla frontend)
+    public Double getPanX() {
+        return panOffset != null ? panOffset.getX() : null;
+    }
+
+    public void setPanX(Double panX) {
+        if (panOffset == null) panOffset = new PanOffset();
+        panOffset.setX(panX != null ? panX : 0);
+    }
+
+    public Double getPanY() {
+        return panOffset != null ? panOffset.getY() : null;
+    }
+
+    public void setPanY(Double panY) {
+        if (panOffset == null) panOffset = new PanOffset();
+        panOffset.setY(panY != null ? panY : 0);
+    }
 }
 

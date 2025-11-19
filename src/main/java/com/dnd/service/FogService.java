@@ -1,87 +1,216 @@
 package com.dnd.service;
 
-import com.dnd.config.MapConfiguration;
 import com.dnd.model.FogState;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service
 public class FogService {
 
-    private final MapConfiguration mapConfiguration;
-    private final ObjectMapper objectMapper;
+    private final MapDataService mapDataService;
+    private final PreviewMapService previewMapService;
 
     @Autowired
-    public FogService(MapConfiguration mapConfiguration) {
-        this.mapConfiguration = mapConfiguration;
-        this.objectMapper = new ObjectMapper();
+    public FogService(MapDataService mapDataService, PreviewMapService previewMapService) {
+        this.mapDataService = mapDataService;
+        this.previewMapService = previewMapService;
     }
 
     public FogState getFogState(String mapName) {
-        File fogFile = getFogFile(mapName);
-
-        if (!fogFile.exists()) {
-            return new FogState(mapName, new ArrayList<>());
-        }
+        System.out.println("🔍 FOGSERVICE.getFogState wywoływane dla: " + mapName);
 
         try {
-            FogState state = objectMapper.readValue(fogFile, FogState.class);
-            if (state.getRevealedAreas() == null) {
-                state.setRevealedAreas(new ArrayList<>());
-            }
-            return state;
-        } catch (IOException e) {
-            System.err.println("Błąd odczytu stanu mgły dla mapy: " + mapName);
-            System.err.println("Szczegóły błędu: " + e.getMessage());
-            System.err.println("Rozmiar pliku: " + fogFile.length() + " bajtów");
+            Map<String, Object> mapData = mapDataService.getMapData(mapName);
 
-            // Jeśli plik jest za duży lub uszkodzony, utwórz backup i zacznij od nowa
-            if (fogFile.length() > 10_000_000) { // 10MB
-                System.err.println("Plik mgły jest za duży! Tworzenie backupu...");
-                File backup = new File(fogFile.getParent(), mapName + "_fog_backup_" + System.currentTimeMillis() + ".json");
-                fogFile.renameTo(backup);
-                System.err.println("Backup utworzony: " + backup.getName());
+            if (mapData == null) {
+                System.out.println("❌ mapDataService.getMapData zwróciło null dla: " + mapName);
+                return new FogState(mapName, new ArrayList<>());
             }
 
+            @SuppressWarnings("unchecked")
+            Map<String, Object> fogSection = (Map<String, Object>) mapData.get("fog");
+
+            if (fogSection == null) {
+                System.out.println("❌ Brak sekcji 'fog' w mapData dla: " + mapName);
+                return new FogState(mapName, new ArrayList<>());
+            }
+
+            System.out.println("✅ Znaleziono sekcję fog dla: " + mapName);
+
+            // Konwertuj dane mgły na FogState
+            String fogMapName = (String) fogSection.get("mapName");
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> areasData = (List<Map<String, Object>>) fogSection.get("revealedAreas");
+
+            System.out.println("🔍 areasData dla " + mapName + ": " + (areasData != null ? areasData.size() : "null"));
+
+            List<FogState.FogPoint> revealedAreas = new ArrayList<>();
+            if (areasData != null) {
+                for (Map<String, Object> areaData : areasData) {
+                    try {
+                        int x = ((Number) areaData.get("x")).intValue();
+                        int y = ((Number) areaData.get("y")).intValue();
+                        int radius = ((Number) areaData.get("radius")).intValue();
+                        boolean isGridCell = Boolean.TRUE.equals(areaData.get("isGridCell"));
+
+                        revealedAreas.add(new FogState.FogPoint(x, y, radius, isGridCell));
+                    } catch (Exception pointError) {
+                        // Ignoruj uszkodzone punkty mgły
+                        System.err.println("⚠️ Ignoruję uszkodzony punkt mgły: " + pointError.getMessage());
+                    }
+                }
+            }
+
+            FogState result = new FogState(fogMapName != null ? fogMapName : mapName, revealedAreas);
+
+            System.out.println("✅ FOGSERVICE zwraca dla " + mapName + ": " + revealedAreas.size() + " obszarów");
+            return result;
+
+        } catch (Exception e) {
+            System.err.println("❌ BŁĄD odczytu stanu mgły dla mapy: " + mapName);
+            System.err.println("❌ Szczegóły błędu: " + e.getMessage());
+
+            // ZAWSZE zwróć jakąkolwiek mgłę - nie null
+            System.out.println("🔄 Zwracam pustą mgłę jako fallback dla mapy: " + mapName);
             return new FogState(mapName, new ArrayList<>());
         }
     }
 
-    public void saveFogState(FogState fogState) {
-        File fogFile = getFogFile(fogState.getMapName());
+    public synchronized void saveFogState(FogState fogState) {
+        long startTime = System.currentTimeMillis();
+        String mapName = fogState.getMapName();
+        int areaCount = fogState.getRevealedAreas().size();
+
+        System.out.println("🔒 SYNCHRONIZED saveFogState START dla: " + mapName + " (" + areaCount + " obszarów)");
+
+        // DIAGNOSTYKA - jeśli 0 obszarów, pokaż kto to wywołał
+        if (areaCount == 0) {
+            System.out.println("⚠️ UWAGA: saveFogState otrzymał 0 obszarów mgły!");
+            System.out.println("📍 Stack trace:");
+            Thread.dumpStack();
+        }
 
         try {
             // Optymalizuj stan mgły przed zapisem
             optimizeFogState(fogState);
 
-            // Upewnij się że katalog istnieje
-            File parentDir = fogFile.getParentFile();
-            if (parentDir != null && !parentDir.exists()) {
-                parentDir.mkdirs();
+            // Pobierz istniejące dane mapy - DEFENSYWNIE
+            Map<String, Object> mapData = null;
+            try {
+                mapData = mapDataService.getMapData(mapName);
+                System.out.println("📖 Odczytano mapData w saveFogState, klucze: " + (mapData != null ? mapData.keySet() : "null"));
+            } catch (Exception e) {
+                System.err.println("⚠️ Błąd odczytu pliku podczas zapisu mgły: " + e.getMessage());
+                // Kontynuuj z mapData = null - zostanie utworzona podstawowa struktura
             }
 
-            // Zapisz używając standardowej metody ObjectMapper
-            // Jest najbardziej niezawodna i nie wymaga dodatkowych walidacji
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(fogFile, fogState);
+            if (mapData == null) {
+                // Plik nie istnieje lub jest uszkodzony - stwórz MINIMALNĄ strukturę
+                System.out.println("🔄 Tworzenie nowego pliku danych dla mapy: " + mapName);
+                mapData = new HashMap<>();
 
-            // Loguj sukces (bez walidacji która powodowała problemy)
-            System.out.println("Stan mgły zapisany pomyślnie dla mapy: " + fogState.getMapName() +
-                             " (punktów: " + fogState.getRevealedAreas().size() + " bajtów)");
+                // Utwórz tylko PODSTAWOWĄ strukturę - bez nadpisywania zaawansowanych ustawień
+                Map<String, Object> settings = new HashMap<>();
+                settings.put("zoom", 1);
+                settings.put("panX", 0);
+                settings.put("panY", 0);
+                settings.put("rotation", 0);
+                settings.put("previewZoom", 100);
+                mapData.put("settings", settings);
 
-        } catch (IOException e) {
-            System.err.println("Błąd zapisu stanu mgły dla mapy: " + fogState.getMapName());
-            System.err.println("Ścieżka pliku: " + fogFile.getAbsolutePath());
-            System.err.println("Szczegóły: " + e.getMessage());
+                Map<String, Object> grid = new HashMap<>();
+                grid.put("size", null);
+                grid.put("offsetX", 0);
+                grid.put("offsetY", 0);
+                grid.put("visible", false);
+                mapData.put("grid", grid);
+
+                Map<String, Object> characters = new HashMap<>();
+                characters.put("players", new ArrayList<>());
+                characters.put("enemies", new ArrayList<>());
+                characters.put("enemyLetterCounter", 0);
+                mapData.put("characters", characters);
+
+                mapData.put("timestamp", java.time.Instant.now().toString());
+                mapData.put("version", "1.0");
+            } else {
+                System.out.println("✅ Odczytano istniejące dane mapy: " + mapName);
+            }
+
+            // Zaktualizuj sekcję mgły
+            Map<String, Object> fogSection = new HashMap<>();
+            fogSection.put("mapName", fogState.getMapName());
+
+            List<Map<String, Object>> areasData = new ArrayList<>();
+            for (FogState.FogPoint point : fogState.getRevealedAreas()) {
+                Map<String, Object> areaData = new HashMap<>();
+                areaData.put("x", point.getX());
+                areaData.put("y", point.getY());
+                areaData.put("radius", point.getRadius());
+                areaData.put("isGridCell", point.isGridCell());
+                areasData.add(areaData);
+            }
+            fogSection.put("revealedAreas", areasData);
+
+            mapData.put("fog", fogSection);
+
+            // Zaktualizuj timestamp
+            mapData.put("timestamp", java.time.Instant.now().toString());
+
+            // PROSTY zapis do unified system
+            try {
+                mapDataService.saveMapData(mapName, mapData);
+                System.out.println("✅ Zapisano mgłę dla mapy: " + mapName + " (" + fogState.getRevealedAreas().size() + " obszarów)");
+            } catch (IOException saveEx) {
+                System.err.println("❌ Błąd zapisu pliku danych dla mapy: " + mapName);
+                System.err.println("❌ Błąd I/O: " + saveEx.getMessage());
+                // Po prostu loguj błąd - podgląd odświeży mgłę ręcznie przyciskiem
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ Błąd zapisu stanu mgły dla mapy: " + fogState.getMapName());
+            System.err.println("❌ Szczegóły: " + e.getMessage());
             e.printStackTrace();
-            throw new RuntimeException("Nie można zapisać stanu mgły dla mapy: " + fogState.getMapName(), e);
+
+        } finally {
+            long duration = System.currentTimeMillis() - startTime;
+            System.out.println("🔓 SYNCHRONIZED saveFogState END dla: " + fogState.getMapName() + " w " + duration + "ms");
+        }
+    }
+
+    // New method for controller compatibility
+    public void saveFogState(String mapName, FogState fogState) {
+        // Ensure the map name is set
+        fogState.setMapName(mapName);
+        saveFogState(fogState);
+    }
+
+    public String getFogStateHash(String mapName) {
+        try {
+            FogState fogState = getFogState(mapName);
+            if (fogState == null || fogState.getRevealedAreas() == null) {
+                return "";
+            }
+
+            // Create a simple hash based on the number of revealed areas and their coordinates
+            StringBuilder hashBuilder = new StringBuilder();
+            hashBuilder.append("areas:").append(fogState.getRevealedAreas().size());
+
+            // Add sum of coordinates for basic change detection
+            long coordSum = fogState.getRevealedAreas().stream()
+                .mapToLong(area -> area.getX() + area.getY() + area.getRadius())
+                .sum();
+            hashBuilder.append(":sum:").append(coordSum);
+
+            return String.valueOf(hashBuilder.toString().hashCode());
+        } catch (Exception e) {
+            return "";
         }
     }
 
@@ -93,9 +222,6 @@ public class FogService {
 
         // Jeśli lista jest za duża (powyżej 1000 punktów), usuń duplikaty i zmniejsz
         if (areas.size() > 1000) {
-            System.out.println("Optymalizacja mgły dla mapy: " + fogState.getMapName() +
-                             " (punktów: " + areas.size() + ")");
-
             // Usuń duplikaty - punkty w bardzo podobnej lokalizacji
             List<FogState.FogPoint> optimized = new ArrayList<>();
             for (FogState.FogPoint point : areas) {
@@ -110,18 +236,15 @@ public class FogService {
             }
 
             fogState.setRevealedAreas(optimized);
-            System.out.println("Po optymalizacji: " + optimized.size() + " punktów");
 
             // Jeśli nadal za dużo (powyżej 5000), weź tylko co N-ty punkt
             if (optimized.size() > 5000) {
-                System.out.println("Nadal za dużo punktów, redukowanie...");
                 List<FogState.FogPoint> reduced = new ArrayList<>();
                 int step = optimized.size() / 5000 + 1;
                 for (int i = 0; i < optimized.size(); i += step) {
                     reduced.add(optimized.get(i));
                 }
                 fogState.setRevealedAreas(reduced);
-                System.out.println("Po redukcji: " + reduced.size() + " punktów");
             }
         }
     }
@@ -141,10 +264,16 @@ public class FogService {
 
     public void addRevealedAreas(String mapName, List<com.dnd.controller.FogController.FogPoint> points) {
         FogState fogState = getFogState(mapName);
+        int originalSize = fogState.getRevealedAreas().size();
+
+        System.out.println("🟢 addRevealedAreas dla " + mapName + ": przed=" + originalSize + ", dodaje=" + points.size());
 
         for (com.dnd.controller.FogController.FogPoint point : points) {
             fogState.getRevealedAreas().add(new FogState.FogPoint(point.getX(), point.getY(), point.getRadius(), point.isGridCell()));
         }
+
+        int finalSize = fogState.getRevealedAreas().size();
+        System.out.println("🟢 addRevealedAreas dla " + mapName + ": po=" + finalSize + " (dodano=" + (finalSize - originalSize) + ")");
 
         saveFogState(fogState);
     }
@@ -152,18 +281,29 @@ public class FogService {
     public void removeRevealedAreas(String mapName, List<com.dnd.controller.FogController.FogPoint> points) {
         FogState fogState = getFogState(mapName);
         List<FogState.FogPoint> revealedAreas = fogState.getRevealedAreas();
+        int originalSize = revealedAreas.size();
+
+        System.out.println("🔴 removeRevealedAreas dla " + mapName + ": przed=" + originalSize + ", usuwa_punktów=" + points.size());
 
         for (com.dnd.controller.FogController.FogPoint pointToRemove : points) {
-            // Usuń punkty w określonym obszarze (z tolerancją dla kratek siatki)
+            System.out.println("  🎯 Usuwam punkt: x=" + pointToRemove.getX() + ", y=" + pointToRemove.getY() + ", radius=" + pointToRemove.getRadius());
+
+            int removedInThisIteration = 0;
             revealedAreas.removeIf(existingPoint -> {
                 double distance = Math.sqrt(
                     Math.pow(existingPoint.getX() - pointToRemove.getX(), 2) +
                     Math.pow(existingPoint.getY() - pointToRemove.getY(), 2)
                 );
-                // Usuń jeśli punkt jest w zasięgu (radius + tolerancja)
-                return distance <= (pointToRemove.getRadius() + 10);
+                boolean shouldRemove = distance <= (pointToRemove.getRadius() + 10);
+                if (shouldRemove) {
+                    System.out.println("    🗑️ Usuwam: x=" + existingPoint.getX() + ", y=" + existingPoint.getY() + " (dist=" + Math.round(distance) + ")");
+                }
+                return shouldRemove;
             });
         }
+
+        int finalSize = revealedAreas.size();
+        System.out.println("🔴 removeRevealedAreas dla " + mapName + ": po=" + finalSize + " (usunięto=" + (originalSize - finalSize) + ")");
 
         saveFogState(fogState);
     }
@@ -181,12 +321,10 @@ public class FogService {
     }
 
     public void resetFog(String mapName) {
+        System.out.println("💥 RESET FOG dla " + mapName + " - kasowanie CAŁEJ mgły!");
         FogState fogState = new FogState(mapName, new ArrayList<>());
         saveFogState(fogState);
     }
 
-    private File getFogFile(String mapName) {
-        Path fogDir = Paths.get(mapConfiguration.getFogStates().getDirectory());
-        return new File(fogDir.toFile(), mapName + "_fog.json");
-    }
+
 }

@@ -34,7 +34,6 @@ public class CharacterService {
             String charactersDir = mapConfiguration.getCharacters().getDirectory();
             File file = new File(charactersDir, mapName + "_characters.json");
             objectMapper.writeValue(file, data);
-            System.out.println("Zapisano postacie dla mapy: " + mapName);
         } catch (IOException e) {
             System.err.println("Błąd zapisywania postaci dla mapy " + mapName + ": " + e.getMessage());
         }
@@ -59,7 +58,6 @@ public class CharacterService {
             File file = new File(charactersDir, mapName + "_characters.json");
             if (file.exists()) {
                 file.delete();
-                System.out.println("Usunięto postacie dla mapy: " + mapName);
             }
         } catch (Exception e) {
             System.err.println("Błąd usuwania postaci dla mapy " + mapName + ": " + e.getMessage());

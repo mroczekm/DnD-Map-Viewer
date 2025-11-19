@@ -43,7 +43,7 @@ class DnDMapViewer {
         this.previewViewportCtx = null;
         this.viewportPollingInterval = null;
         this.previewViewportColor = '#ff0000';
-        this.previewViewportVisible = true;
+        this.previewViewportVisible = false;
 
         // Obrót mapy
         this.rotation = 0;
@@ -80,8 +80,6 @@ class DnDMapViewer {
         this.autoSaveInterval = setInterval(() => {
             this.autoSaveAllSettings();
         }, 30000); // 30 sekund
-
-        console.log('🔄 Automatyczny zapis uruchomiony (co 30s)');
     }
 
     async autoSaveAllSettings() {
@@ -98,8 +96,6 @@ class DnDMapViewer {
 
             // 3. Zapisz postacie
             await this.saveCharacters();
-
-            console.log('✅ Auto-save completed for', this.currentMap.name);
         } catch (error) {
             console.error('❌ Auto-save error:', error);
         }
@@ -116,11 +112,7 @@ class DnDMapViewer {
             }
             keysToRemove.forEach(key => {
                 localStorage.removeItem(key);
-                console.log(`Removed old fog data: ${key}`);
             });
-            if (keysToRemove.length > 0) {
-                console.log(`Cleared ${keysToRemove.length} old fog data entries from localStorage`);
-            }
         } catch (e) {
             console.error('Error clearing old fog data:', e);
         }
@@ -175,6 +167,11 @@ class DnDMapViewer {
         this.previewViewportCanvas = document.getElementById('previewViewportCanvas');
         if (this.previewViewportCanvas) {
             this.previewViewportCtx = this.previewViewportCanvas.getContext('2d');
+            // Ustaw początkowe wymiary viewport canvas
+            this.previewViewportCanvas.width = 200;
+            this.previewViewportCanvas.height = 150;
+            this.previewViewportCanvas.style.width = '200px';
+            this.previewViewportCanvas.style.height = '150px';
         }
         this.previewViewportColorPicker = document.getElementById('previewViewportColorPicker');
         this.togglePreviewViewportBtn = document.getElementById('togglePreviewViewportBtn');
@@ -208,7 +205,6 @@ class DnDMapViewer {
         // Inicjalizuj gridAreaSizeValue na końcu, gdy wszystkie elementy są załadowane
         if(this.gridAreaSize) {
             this.gridAreaSizeValue = parseInt(this.gridAreaSize.value) || 3;
-            console.log('Initialized gridAreaSizeValue to:', this.gridAreaSizeValue);
         }
     }
 
@@ -216,7 +212,6 @@ class DnDMapViewer {
         // Sprawdź czy elementy istnieją przed dodaniem event listenerów
         if(this.mapSelect) {
             this.mapSelect.addEventListener('change', e => {
-                console.log('Map selected:', e.target.value);
                 this.loadMap(e.target.value);
 
                 // Odśwież postacie i mgłę po załadowaniu mapy
@@ -240,24 +235,10 @@ class DnDMapViewer {
         if(this.gridAreaSize) {
             // Ponownie zsynchronizuj wartość na początku initEvents
             this.gridAreaSizeValue = parseInt(this.gridAreaSize.value) || 3;
-            console.log('Re-synchronized gridAreaSizeValue to:', this.gridAreaSizeValue);
-            console.log('Current select value:', this.gridAreaSize.value);
-            console.log('Current select element:', this.gridAreaSize);
 
             this.gridAreaSize.addEventListener('change', e => {
-                console.log('Grid area size changed from:', this.gridAreaSizeValue);
-                console.log('Grid area size changed to:', e.target.value);
-                console.log('Parse result:', parseInt(e.target.value));
                 this.gridAreaSizeValue = parseInt(e.target.value);
-                console.log('New gridAreaSizeValue:', this.gridAreaSizeValue);
-
-                // Dodatkowe sprawdzenie
-                if(this.gridAreaSizeValue !== parseInt(e.target.value)) {
-                    console.error('Value assignment failed!');
-                }
             });
-        } else {
-            console.error('gridAreaSize element not found');
         }
 
         this.resetFogBtn.addEventListener('click', () => this.resetFog());
@@ -276,7 +257,6 @@ class DnDMapViewer {
                 this.updateCursor();
             }
             if(e.key === 'Shift'){
-                console.log('🔵 Shift WCIŚNIĘTY');
                 this.isShiftPressed = true;
                 this.updateCursor();
             }
@@ -288,7 +268,6 @@ class DnDMapViewer {
                 this.clearHighlight();
             }
             if(e.key === 'Shift'){
-                console.log('🔴 Shift PUSZCZONY');
                 this.isShiftPressed = false;
                 this.draggingCharacter = null;
                 this.updateCursor();
@@ -492,7 +471,6 @@ class DnDMapViewer {
             }
 
             const maps = await response.json();
-            console.log('Wczytano listę map:', maps);
 
             // Wyczyść select
             this.mapSelect.innerHTML = '<option value="">-- Wybierz mapę --</option>';
@@ -504,8 +482,6 @@ class DnDMapViewer {
                 option.textContent = map.name;
                 this.mapSelect.appendChild(option);
             });
-
-            console.log('Lista map wypełniona, dostępnych map:', maps.length);
         } catch (error) {
             console.error('Błąd wczytywania listy map:', error);
             alert('Nie można wczytać listy map. Sprawdź czy serwer działa.');
@@ -573,13 +549,49 @@ class DnDMapViewer {
 
             if (response.ok) {
                 alert(`Mapa "${mapName}" została usunięta`);
+
+                // Zatrzymaj synchronizację mgły
+                this.stopFogSynchronization();
+
                 // Wyczyść aktualnie wybraną mapę
                 this.currentMap = null;
+                this.fogState = null;
+                this.characters = { players: [], enemies: [] };
+
+                // Wyczyść wszystkie canvas
+                if (this.fogCanvas) {
+                    this.fogCtx.clearRect(0, 0, this.fogCanvas.width, this.fogCanvas.height);
+                    this.fogCanvas.classList.add('hidden');
+                }
+                if (this.gridCanvas) {
+                    this.gridCtx.clearRect(0, 0, this.gridCanvas.width, this.gridCanvas.height);
+                    this.gridCanvas.classList.add('hidden');
+                }
+                if (this.calibrationCanvas) {
+                    this.calibrationCtx.clearRect(0, 0, this.calibrationCanvas.width, this.calibrationCanvas.height);
+                    this.calibrationCanvas.classList.add('hidden');
+                }
+                if (this.charactersCanvas) {
+                    this.charactersCtx.clearRect(0, 0, this.charactersCanvas.width, this.charactersCanvas.height);
+                    this.charactersCanvas.classList.add('hidden');
+                }
+                if (this.previewViewportCanvas) {
+                    this.previewViewportCtx.clearRect(0, 0, this.previewViewportCanvas.width, this.previewViewportCanvas.height);
+                    this.previewViewportCanvas.classList.add('hidden');
+                }
+
+                // Ukryj obraz mapy
+                this.mapImage.src = '';
                 this.mapImage.classList.add('hidden');
-                this.fogCanvas.classList.add('hidden');
-                this.gridCanvas.classList.add('hidden');
-                // Odśwież listę map
+
+                // Wyczyść siatki
+                this.gridSize = null;
+                this.gridVisible = false;
+                this.gridStatus.textContent = 'Siatka: brak';
+
+                // Odśwież listę map i zresetuj select
                 await this.loadMapsList();
+                this.mapSelect.value = '';
             } else {
                 const error = await response.text();
                 alert(`Błąd podczas usuwania mapy: ${error}`);
@@ -626,8 +638,6 @@ class DnDMapViewer {
         this.fogPollingInterval = setInterval(() => {
             this.syncFogState();
         }, 2000);
-
-        console.log('Rozpoczęto synchronizację mgły');
     }
 
     // Nowa metoda do zatrzymania synchronizacji mgły
@@ -635,7 +645,6 @@ class DnDMapViewer {
         if (this.fogPollingInterval) {
             clearInterval(this.fogPollingInterval);
             this.fogPollingInterval = null;
-            console.log('Zatrzymano synchronizację mgły');
         }
     }
 
@@ -655,10 +664,9 @@ class DnDMapViewer {
                 this.fogState = newFogState;
                 this.lastFogStateHash = newStateHash;
                 this.renderFog();
-                console.log('Zaktualizowano stan mgły z serwera');
             }
         } catch (error) {
-            console.error('Błąd synchronizacji mgły:', error);
+            // Cicha synchronizacja
         }
     }
 
@@ -696,7 +704,6 @@ class DnDMapViewer {
                     });
                 }
 
-                console.log(`Wczytano stan mgły: ${this.revealedCells.size} odkrytych komórek`);
                 this.renderFog();
             }
         } catch(e){
@@ -773,7 +780,6 @@ class DnDMapViewer {
                 })
             }).then(() => {
                 this.gridStatus.textContent = `Siatka: ${this.gridSize.toFixed(1)}px (zapisana)`;
-                console.log('Siatka zapisana:', {gridSize: this.gridSize, offsetX: this.gridOffsetX, offsetY: this.gridOffsetY});
             }).catch((err) => {
                 console.error('Błąd zapisu siatki:', err);
                 alert('Błąd zapisu siatki');
@@ -821,23 +827,6 @@ class DnDMapViewer {
             this.drawGrid();
 
             this.gridStatus.textContent = `Siatka: ${countX}x${countY} (${this.gridSize.toFixed(2)}px, kwadratowa, wycentrowana)`;
-
-            console.log('Wygenerowano siatkę z ilości kratek:', {
-                countX,
-                countY,
-                gridSize: this.gridSize,
-                mapWidth: this.currentMap.width,
-                mapHeight: this.currentMap.height,
-                sizeX: sizeX.toFixed(2),
-                sizeY: sizeY.toFixed(2),
-                usedSize: Math.min(sizeX, sizeY).toFixed(2),
-                offsetX: this.gridOffsetX,
-                offsetY: this.gridOffsetY,
-                coverageX: (this.gridSize * countX).toFixed(2) + 'px z ' + this.currentMap.width + 'px',
-                coverageY: (this.gridSize * countY).toFixed(2) + 'px z ' + this.currentMap.height + 'px',
-                marginX: (this.currentMap.width - totalWidthUsed).toFixed(2) + 'px',
-                marginY: (this.currentMap.height - totalHeightUsed).toFixed(2) + 'px'
-            });
         }
     }
 
@@ -1121,8 +1110,6 @@ class DnDMapViewer {
         const paintPoints = pts.filter(p => p.action === 'paint');
         const erasePoints = pts.filter(p => p.action === 'erase' || !p.action);
 
-        console.log(`Wysyłanie do serwera: ${paintPoints.length} malowanie, ${erasePoints.length} usuwanie`);
-
         try {
             // Malowanie mgły = usuwanie z odkrytych obszarów
             if(paintPoints.length > 0) {
@@ -1135,7 +1122,6 @@ class DnDMapViewer {
                 if(!res.ok) {
                     throw new Error(`Błąd malowania mgły: ${res.status}`);
                 }
-                console.log(`✓ Zapisano ${paintPoints.length} punktów malowania mgły`);
             }
 
             // Usuwanie mgły = dodawanie do odkrytych obszarów
@@ -1149,7 +1135,6 @@ class DnDMapViewer {
                 if(!res.ok) {
                     throw new Error(`Błąd usuwania mgły: ${res.status}`);
                 }
-                console.log(`✓ Zapisano ${erasePoints.length} punktów usuwania mgły`);
             }
 
             // NIE wywołuj syncFogState() - synchronizacja co 2 sekundy przez polling
@@ -1177,8 +1162,6 @@ class DnDMapViewer {
                 lineWidth: this.gridLineWidth || 1.0
             };
 
-            console.log('Zapisywanie konfiguracji siatki:', body);
-
             const r = await fetch(`/api/grid/${this.currentMap.name}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -1190,7 +1173,6 @@ class DnDMapViewer {
                 throw new Error(txt || 'Błąd zapisu');
             }
 
-            console.log('Siatka zapisana, przeładowywanie...');
 
             // Przeładuj konfigurację z serwera aby mieć pewność że jest zsynchronizowana
             await this.loadGridConfig();
@@ -1258,7 +1240,6 @@ class DnDMapViewer {
                 this.gridLineWidth = 1.0;
             }
         } catch(e){
-            console.error(e);
             this.gridStatus.textContent = 'Siatka: błąd';
         }
     }
@@ -1271,10 +1252,9 @@ class DnDMapViewer {
                 this.fogState = await r.json();
                 this.lastFogStateHash = this.calculateFogStateHash(this.fogState);
                 this.renderFog();
-                console.log('Załadowano stan mgły z serwera');
             }
         } catch(e){
-            console.error(e);
+            // Cicha synchronizacja
         }
     }
 
@@ -1342,14 +1322,6 @@ class DnDMapViewer {
     onMouseDown(e){
         if(e.button !== 0) return;
 
-        console.log('🖱️ onMouseDown:', {
-            isShift: this.isShiftPressed,
-            characterMode: this.characterMode,
-            gridSize: this.gridSize,
-            isPaintingFog: this.isPaintingFog,
-            isErasingFog: this.isErasingFog
-        });
-
         if(this.isCalibrating){
             this.handleCalibrationClick(e);
             return;
@@ -1357,14 +1329,12 @@ class DnDMapViewer {
         
         // SHIFT + klik = przesuwanie postaci (zawsze gdy jest siatka)
         if(this.isShiftPressed && this.gridSize) {
-            console.log('✅ Wywołuję handleCharacterClick dla Shift');
             this.handleCharacterClick(e);
             return;
         }
 
         // Obsługa modułu postaci (dodawanie/usuwanie)
         if(this.characterMode) {
-            console.log('✅ Wywołuję handleCharacterClick dla characterMode');
             this.handleCharacterClick(e);
             return;
         }
@@ -1728,7 +1698,6 @@ class DnDMapViewer {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(body)
             });
-            console.log(`Fog ${action} sent to server:`, body);
         } catch(e) {
             console.error('Błąd zapisu mgły na serwer:', e);
         }
@@ -1874,42 +1843,27 @@ class DnDMapViewer {
 
     handleCharacterClick(e) {
         if (!this.gridSize) {
-            console.log('❌ Brak siatki, przesuwanie niemożliwe');
             return;
         }
 
         const pos = this.getMousePos(e);
         const cell = this.getGridCell(pos.x, pos.y);
         if (!cell) {
-            console.log('❌ Nie można uzyskać komórki siatki');
             return;
         }
 
-        console.log('✅ handleCharacterClick:', {
-            isShift: this.isShiftPressed,
-            characterMode: this.characterMode,
-            cell,
-            draggingCharacter: this.draggingCharacter
-        });
-
         // Shift+klik = podnieś postać (upuść w onMouseUp)
         if (this.isShiftPressed) {
-            console.log('🔵 SHIFT AKTYWNY - tryb przesuwania');
-
             // Podnieś postać z tej kratki
             const charAtCell = this.findCharacterAtCell(cell.x, cell.y);
             if (charAtCell) {
-                console.log('🎯 Podniesiono postać:', charAtCell);
                 this.draggingCharacter = charAtCell;
                 this.updateCursor();
-            } else {
-                console.log('❌ Brak postaci na tej kratce');
             }
             return; // Ważne - nie przechodzimy dalej
         }
 
         // Normalne tryby (dodawanie/usuwanie) - tylko gdy NIE ma Shift
-        console.log('🔷 Tryb normalny (nie Shift), characterMode:', this.characterMode);
         if (!this.characterMode) return;
 
         // Tryb usuwania
@@ -1921,7 +1875,6 @@ class DnDMapViewer {
         // Sprawdź czy już jest postać w tej kratce
         const existingIndex = this.findCharacterAtCell(cell.x, cell.y);
         if (existingIndex) {
-            console.log('Na tym polu już jest postać');
             return;
         }
 
@@ -1938,46 +1891,31 @@ class DnDMapViewer {
     }
 
     findCharacterAtCell(cellX, cellY) {
-        console.log('🔍 findCharacterAtCell szuka w:', { cellX, cellY });
-        console.log('📊 Dostępni gracze:', this.characters.players);
-        console.log('📊 Dostępni wrogowie:', this.characters.enemies);
-
         const tolerance = this.gridSize ? this.gridSize / 2 : 10; // Tolerancja na zaokrąglenia
 
         // Sprawdź graczy
-        const playerIndex = this.characters.players.findIndex((p, idx) => {
-            // Sprawdź czy postać jest w tej samej kratce (z tolerancją)
-            const match = Math.abs(p.x - cellX) < tolerance && Math.abs(p.y - cellY) < tolerance;
-            console.log(`  Gracz[${idx}]: x=${p.x}, y=${p.y}, różnicaX=${Math.abs(p.x - cellX).toFixed(2)}, różnicaY=${Math.abs(p.y - cellY).toFixed(2)}, dopasowanie=${match}`);
-            return match;
+        const playerIndex = this.characters.players.findIndex(p => {
+            return Math.abs(p.x - cellX) < tolerance && Math.abs(p.y - cellY) < tolerance;
         });
         if (playerIndex !== -1) {
-            console.log('✅ Znaleziono gracza na indeksie:', playerIndex);
             return { type: 'player', index: playerIndex };
         }
 
         // Sprawdź wrogów
-        const enemyIndex = this.characters.enemies.findIndex((e, idx) => {
-            const match = Math.abs(e.x - cellX) < tolerance && Math.abs(e.y - cellY) < tolerance;
-            console.log(`  Wróg[${idx}]: x=${e.x}, y=${e.y}, letter=${e.letter}, różnicaX=${Math.abs(e.x - cellX).toFixed(2)}, różnicaY=${Math.abs(e.y - cellY).toFixed(2)}, dopasowanie=${match}`);
-            return match;
+        const enemyIndex = this.characters.enemies.findIndex(e => {
+            return Math.abs(e.x - cellX) < tolerance && Math.abs(e.y - cellY) < tolerance;
         });
         if (enemyIndex !== -1) {
-            console.log('✅ Znaleziono wroga na indeksie:', enemyIndex);
             return { type: 'enemy', index: enemyIndex };
         }
 
-        console.log('❌ Nie znaleziono żadnej postaci na tej kratce');
         return null;
     }
 
     moveCharacterToCell(character, newCellX, newCellY) {
-        console.log('📍 moveCharacterToCell:', { character, newCellX, newCellY });
-
         // Sprawdź czy docelowa kratka jest pusta (ignoruj tę samą postać!)
         const existingChar = this.findCharacterAtCell(newCellX, newCellY);
         if (existingChar && !(existingChar.type === character.type && existingChar.index === character.index)) {
-            console.log('❌ Docelowa kratka jest zajęta przez inną postać:', existingChar);
             return;
         }
 
@@ -1990,7 +1928,6 @@ class DnDMapViewer {
             this.characters.enemies[character.index].y = newCellY;
         }
 
-        console.log(`✅ Przeniesiono postać ${character.type} na (${newCellX}, ${newCellY})`);
         this.drawCharacters();
         this.saveCharacters();
     }
@@ -2057,7 +1994,6 @@ class DnDMapViewer {
             return;
         }
 
-        console.log('📍 handleCharacterDrop - upuszczam na:', cell);
 
         // Przenieś postać używając moveCharacterToCell (ma już całą logikę)
         this.moveCharacterToCell(this.draggingCharacter, cell.x, cell.y);
@@ -2258,9 +2194,6 @@ class DnDMapViewer {
             const response = await fetch(`/api/map-settings/${this.currentMap.name}`);
 
             if (!response.ok) {
-                if (response.status === 404) {
-                    console.log('Brak zapisanych ustawień dla mapy:', this.currentMap.name);
-                }
                 return;
             }
 

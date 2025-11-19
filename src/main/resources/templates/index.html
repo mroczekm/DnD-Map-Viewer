@@ -119,6 +119,11 @@
                                 <i class="material-icons mdc-button__icon">dangerous</i>
                                 <span class="mdc-button__label">Dodaj wroga</span>
                             </button>
+                            <button id="moveCharacterBtn" class="mdc-button mdc-button--outlined character-btn">
+                                <span class="mdc-button__ripple"></span>
+                                <i class="material-icons mdc-button__icon">drag_indicator</i>
+                                <span class="mdc-button__label">Przesuń postać</span>
+                            </button>
                             <button id="removeCharacterBtn" class="mdc-button mdc-button--outlined character-btn character-btn--danger">
                                 <span class="mdc-button__ripple"></span>
                                 <i class="material-icons mdc-button__icon">delete</i>
@@ -166,11 +171,6 @@
                                 <i class="material-icons mdc-button__icon">grid_on</i>
                                 <span class="mdc-button__label">Pokaż/Ukryj siatka</span>
                             </button>
-                            <button id="togglePreviewViewportBtn" class="mdc-button mdc-button--outlined">
-                                <span class="mdc-button__ripple"></span>
-                                <i class="material-icons mdc-button__icon">visibility</i>
-                                <span class="mdc-button__label">Ukryj podgląd</span>
-                            </button>
                         </div>
 
                         <div class="rotation-control">
@@ -209,7 +209,7 @@
                             </div>
                             <div class="color-control">
                                 <label for="fogOpacitySlider">Przezroczystość mgły: <span id="fogOpacityValue">65%</span></label>
-                                <input type="range" id="fogOpacitySlider" min="0" max="100" value="65" class="opacity-slider">
+                                <input type="range" id="fogOpacitySlider" min="0" max="1" value="0.65" class="opacity-slider">
                             </div>
                         </div>
 
@@ -224,12 +224,6 @@
                             </div>
                         </div>
 
-                        <div class="fog-color-controls">
-                            <div class="color-control">
-                                <label for="previewViewportColorPicker">Kolor ramki podglądu:</label>
-                                <input type="color" id="previewViewportColorPicker" value="#ff0000" class="color-picker">
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -291,51 +285,101 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Preview Control - przeniesione pod Konfigurację siatki -->
+                    <div class="preview-control-section">
+                        <button id="setPreviewMapBtn" class="mdc-button mdc-button--outlined preview-btn">
+                            <span class="mdc-button__ripple"></span>
+                            <i class="material-icons mdc-button__icon">visibility</i>
+                            <span class="mdc-button__label">Wczytaj podgląd</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Preview Control at Bottom -->
+                <div class="sidebar-footer">
+
+                    <!-- Version Info -->
+                    <div class="version-info">
+                        <div class="version-compact">
+                            <span id="appVersion" class="version-value">1.20</span> • <span id="buildDate" class="version-value">2025-11-18 16:29</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Preview Control at Bottom -->
-            <div class="sidebar-footer">
-                <button id="setPreviewMapBtn" class="mdc-button mdc-button--outlined footer-btn">
-                    <span class="mdc-button__ripple"></span>
-                    <i class="material-icons mdc-button__icon">visibility</i>
-                    <span class="mdc-button__label">Wczytaj podgląd</span>
-                </button>
-            </div>
+
+
         </div>
 
         <!-- Main Content Area -->
         <div class="main-content">
             <div class="left-controls">
                 <div class="navigation-controls">
-                    <div class="nav-row"><button id="navUpBtn" class="nav-btn" title="Góra">▲</button></div>
+                    <div class="nav-row"><button id="navUpBtn" class="nav-btn" title="Podgląd - góra">▲</button></div>
                     <div class="nav-row">
-                        <button id="navLeftBtn" class="nav-btn" title="Lewo">◀</button>
-                        <button id="navCenterBtn" class="nav-btn" title="Wycentruj">⚫</button>
-                        <button id="navRightBtn" class="nav-btn" title="Prawo">▶</button>
+                        <button id="navLeftBtn" class="nav-btn" title="Podgląd - lewo">◀</button>
+                        <button id="navCenterBtn" class="nav-btn" title="Wycentruj podgląd">⚫</button>
+                        <button id="navRightBtn" class="nav-btn" title="Podgląd - prawo">▶</button>
                     </div>
-                    <div class="nav-row"><button id="navDownBtn" class="nav-btn" title="Dół">▼</button></div>
+                    <div class="nav-row"><button id="navDownBtn" class="nav-btn" title="Podgląd - dół">▼</button></div>
                 </div>
                 <div class="zoom-controls">
-                    <button id="zoomInBtn" class="zoom-btn" title="Powiększ">+</button>
-                    <div id="zoomLevel" class="zoom-level">100%</div>
-                    <button id="zoomOutBtn" class="zoom-btn" title="Pomniejsz">-</button>
-                    <button id="rotatePreviewBtn" class="zoom-btn" title="Obróć podgląd">🔄</button>
+                    <div class="zoom-input-row">
+                        <input type="number" id="zoomLevel" class="zoom-input" min="10" max="500" step="5" value="100" title="Zoom podglądu %" />
+                        <span class="zoom-unit">%</span>
+                        <button id="rotatePreviewLeftBtn" class="zoom-precise-btn" title="Obróć mapę o -90°">↶</button>
+                        <button id="rotatePreviewBtn" class="zoom-precise-btn" title="Obróć mapę o +90°">↷</button>
+                    </div>
                 </div>
             </div>
             <div class="map-container" id="mapContainer">
                 <div class="map-wrapper" id="mapWrapper">
                     <img id="mapImage" class="map-image hidden" alt="Mapa DnD">
-                    <canvas id="gridCanvas" class="fog-layer hidden" style="z-index:5;"></canvas>
+                    <canvas id="gridCanvas" class="fog-layer hidden"></canvas>
                     <canvas id="fogCanvas" class="fog-layer hidden"></canvas>
                     <canvas id="calibrationCanvas" class="fog-layer hidden"></canvas>
-                    <canvas id="previewViewportCanvas" class="fog-layer hidden" style="z-index:15;"></canvas>
-                    <canvas id="charactersCanvas" class="fog-layer hidden" style="z-index:20;"></canvas>
+                    <canvas id="viewportOverlayCanvas" class="fog-layer hidden"></canvas>
+                    <canvas id="charactersCanvas" class="fog-layer hidden"></canvas>
+                </div>
+
+                <!-- Kontrolki zoom GM w prawym dolnym rogu -->
+                <div class="precise-zoom-controls">
+                    <div class="zoom-title">Zoom GM</div>
+                    <div class="zoom-input-row">
+                        <button id="zoomDecrease1Btn" class="zoom-precise-btn" title="Zmniejsz mapę GM">-</button>
+                        <input type="number" id="zoomInput" class="zoom-input" min="10" max="500" step="1" value="100" title="Zoom mapy GM %" />
+                        <span class="zoom-unit">%</span>
+                        <button id="zoomIncrease1Btn" class="zoom-precise-btn" title="Zwiększ mapę GM">+</button>
+                    </div>
+                    <div class="zoom-presets">
+                        <button id="zoom50Btn" class="zoom-preset-btn">50%</button>
+                        <button id="zoom100Btn" class="zoom-preset-btn">100%</button>
+                        <button id="zoom150Btn" class="zoom-preset-btn">150%</button>
+                        <button id="zoom200Btn" class="zoom-preset-btn">200%</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="/js/app.js"></script>
+    <!-- Modular JavaScript files -->
+    <script src="/js/ui.js"></script>
+    <script src="/js/input.js"></script>
+    <script src="/js/grid.js"></script>
+    <script src="/js/fog.js"></script>
+    <script src="/js/characters.js"></script>
+    <script src="/js/viewport.js"></script>
+    <script>
+        // TYMCZASOWE DEBUGOWANIE VIEWPORTMANAGER
+        console.log('🔍 IMMEDIATE CHECK after viewport.js load:');
+        console.log('   ViewportManager available:', typeof ViewportManager);
+        console.log('   window.ViewportManager available:', typeof window.ViewportManager);
+        setTimeout(() => {
+            console.log('🔍 DELAYED CHECK (100ms after):');
+            console.log('   ViewportManager available:', typeof ViewportManager);
+            console.log('   window.ViewportManager available:', typeof window.ViewportManager);
+        }, 100);
+    </script>
+    <script src="/js/app-modular.js"></script>
 </body>
 </html>

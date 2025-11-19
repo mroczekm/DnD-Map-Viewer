@@ -2,7 +2,11 @@ version: '3.8'
 
 services:
   dnd-app:
-    build: .
+    # Używamy obrazu z Docker Hub (wspiera AMD64 i ARM64)
+    image: mroczas88/dnd-map-viewer:latest
+    # Alternatywnie możesz budować lokalnie odkomentowując poniższą linię:
+    # build: .
+    container_name: dnd-map-viewer
     ports:
       - "8080:8080"
     volumes:
@@ -16,7 +20,21 @@ services:
       - DND_GRID_DIR=/app/data/grid-configs
       - DND_CHARACTERS_DIR=/app/data/characters
       - DND_SETTINGS_DIR=/app/data/settings
+      # Java memory settings
+      - JAVA_OPTS=-Xmx512m -Xms256m
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/gm"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     restart: unless-stopped
+    networks:
+      - dnd-network
+
+networks:
+  dnd-network:
+    driver: bridge
 
 # Wszystkie dane w JEDNYM katalogu ./data:
 # ./data/
