@@ -461,10 +461,7 @@ class DnDMapViewer {
                 }
 
                 try {
-                    console.log('🔄 Wczytaj podgląd: Rozpoczynam proces dla mapy:', mapName);
 
-                    // PIERWSZY: Wymuś pełne odświeżenie podglądu (więcej metod)
-                    console.log('📺 Wymuszam pełne odświeżenie podglądu...');
 
                     // Metoda 1: Standardowy refresh endpoint
                     await fetch('/api/preview-map/refresh', {
@@ -503,10 +500,7 @@ class DnDMapViewer {
                         throw new Error(`Błąd ustawiania mapy: ${mapResponse.status}`);
                     }
 
-                    console.log('✅ Mapa ustawiona pomyślnie');
 
-                    // TRZECI: Konfiguruj podgląd z aktualnymi ustawieniami GM
-                    console.log('⚙️ Synchronizuję ustawienia z GM...');
 
                     // Włącz tryb zdalnego sterowania
                     this.previewViewportVisible = false; // Ramka ukryta
@@ -531,7 +525,6 @@ class DnDMapViewer {
 
                     // Wyślij postacie jeśli są
                     if (this.characters && (this.characters.players.length || this.characters.enemies.length)) {
-                        console.log('👥 Wysyłam postacie do podglądu...');
                         await this.sendCharactersToPreview(mapName);
                     }
 
@@ -571,7 +564,6 @@ class DnDMapViewer {
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({ action: 'refresh-fog' })
                     });
-                    console.log('✅ Żądanie odświeżenia mgły zostało wysłane');
                 } catch (err) {
                     console.error('❌ Błąd odświeżenia mgły:', err);
                 }
@@ -669,7 +661,6 @@ class DnDMapViewer {
     async autoSaveAllSettings() {
         if (!this.currentMap) return;
 
-        console.log('🕒 autoSaveAllSettings() - używa TYLKO saveMapSettings (bezpieczne dla mgły)');
 
         try {
             // ZMIANA: Używaj TYLKO saveMapSettings zamiast saveAllMapData
@@ -685,7 +676,6 @@ class DnDMapViewer {
             }
 
             // Mgła jest zapisywana osobno przez FogService - nie dotykamy jej
-            console.log('✅ autoSaveAllSettings() zakończone - mgła nietknięta');
 
         } catch (error) {
             console.error('❌ Auto-save error:', error);

@@ -221,7 +221,6 @@ class FogManager {
                 // Renderuj pełną mgłę
                 await this.renderFullFog();
 
-                alert('✅ Mgła została zresetowana!');
             } else {
                 const error = await response.text();
                 alert(`❌ Błąd podczas resetowania mgły: ${error}`);

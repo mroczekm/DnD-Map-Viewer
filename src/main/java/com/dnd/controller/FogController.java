@@ -27,10 +27,6 @@ public class FogController {
     public ResponseEntity<FogState> getFogState(@PathVariable String mapName) {
         FogState fogState = fogService.getFogState(mapName);
 
-        // ZAWSZE loguj żeby zobaczyć dokładnie co podgląd pobiera
-        System.out.println("📡 PODGLĄD POBIERA: " + mapName + " → " +
-            fogState.getRevealedAreas().size() + " obszarów mgły");
-
         return ResponseEntity.ok(fogState);
     }
 

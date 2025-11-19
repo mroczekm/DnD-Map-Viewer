@@ -189,7 +189,6 @@ class UIManager {
 
                 // Odśwież listę map
                 await this.viewer.loadMapsList();
-                alert(`✅ Mapa "${mapName}" została usunięta!`);
             } else {
                 const error = await response.text();
                 alert(`❌ Błąd podczas usuwania mapy: ${error}`);
@@ -252,7 +251,6 @@ class UIManager {
 }
 
 // Debug - sprawdź czy klasa jest dostępna
-console.log('✅ UIManager class loaded');
 window.UIManager = UIManager;
 
 // Eksport dla innych modułów

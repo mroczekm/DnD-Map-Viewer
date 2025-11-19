@@ -356,7 +356,6 @@ class ViewportManager {
         this.updateRotationDisplay();
         this.viewer.applyTransform();
         this.viewer.drawCharacters();
-        console.log('🎯 ViewportManager.rotate() wywołuje saveMapSettings()');
         this.viewer.saveMapSettings(); // Tylko settings, nie nadpisuj całego pliku
         this.reportCurrentViewport();
     }
@@ -375,7 +374,6 @@ class ViewportManager {
         this.updateRotationDisplay();
         this.viewer.applyTransform();
         this.viewer.drawCharacters();
-        console.log('🎯 ViewportManager.resetRotation() wywołuje saveMapSettings()');
         this.viewer.saveMapSettings(); // Tylko settings, nie nadpisuj całego pliku
         this.reportCurrentViewport();
     }
@@ -421,12 +419,10 @@ class ViewportManager {
 
     async fetchPreviewViewport() {
         try {
-            console.log('🔍 GM: fetchPreviewViewport() - pobieranie danych z /api/preview-map/viewport');
 
             // Debug: rozmiary kontenera GM dla porównania
             const gmContainerWidth = this.viewer.mapContainer?.clientWidth || 0;
             const gmContainerHeight = this.viewer.mapContainer?.clientHeight || 0;
-            console.log(`📏 GM Container rozmiary: ${gmContainerWidth}x${gmContainerHeight}`);
 
             const res = await fetch('/api/preview-map/viewport');
             if (!res.ok) {
@@ -434,34 +430,18 @@ class ViewportManager {
                 return;
             }
             const data = await res.json();
-            console.log('📥 GM: Otrzymano viewport z serwera:', {
-                x: data.x, y: data.y, width: data.width, height: data.height,
-                zoom: data.zoom, rotation: data.rotation,
-                podgladContainer: `${data.containerWidth}x${data.containerHeight}` // z podglądu
-            });
 
-            // Porównaj rozmiary kontenerów
-            if (data.containerWidth && data.containerHeight) {
-                console.log('📊 PORÓWNANIE kontenerów:');
-                console.log(`   GM: ${gmContainerWidth}x${gmContainerHeight}`);
-                console.log(`   Podgląd: ${data.containerWidth}x${data.containerHeight}`);
 
-                if (gmContainerWidth !== data.containerWidth || gmContainerHeight !== data.containerHeight) {
-                    console.warn('⚠️ RÓŻNE ROZMIARY KONTENERÓW - to może być przyczyna problemu!');
-                }
-            }
+
 
             // Oczekiwane pola: x,y,width,height,zoom,rotation,mapWidth,mapHeight
             if (data && typeof data.x === 'number' && typeof data.y === 'number' && typeof data.width === 'number') {
-                console.log('✅ GM: Dane viewport są poprawne, zapisuję do serverViewport');
                 this.serverViewport = data;
                 this.drawServerViewportOverlay();
             } else {
-                console.warn('⚠️ GM: Dane viewport są nieprawidłowe:', data);
             }
         } catch (e) {
             // Ignoruj gdy podgląd nie ustawiony
-            console.log('⚪ GM: fetchPreviewViewport error (prawdopodobnie brak podglądu):', e.message);
         }
     }
 
@@ -472,7 +452,6 @@ class ViewportManager {
             this.viewer.viewportOverlayCanvas.style.visibility = 'hidden';
             this.viewer.viewportOverlayCanvas.style.display = 'none';
             this.viewer.viewportOverlayCanvas.style.pointerEvents = 'none';
-            console.log('🔍 Viewport overlay ukryty (opacity=0, visibility=hidden, display=none)');
         }
         return;
     }
@@ -492,7 +471,6 @@ class ViewportManager {
             this.viewer.viewportOverlayCanvas.style.visibility = 'visible';
             this.viewer.viewportOverlayCanvas.style.display = 'block';
             this.viewer.viewportOverlayCanvas.style.pointerEvents = 'auto';
-            console.log('🔍 Viewport overlay pokazany (opacity=0.8, visible)');
         }
     }
 
@@ -502,13 +480,11 @@ class ViewportManager {
             this.viewer.viewportOverlayCanvas.style.visibility = 'hidden';
             this.viewer.viewportOverlayCanvas.style.display = 'none';
             this.viewer.viewportOverlayCanvas.style.pointerEvents = 'none';
-            console.log('🔍 Viewport overlay ukryty (opacity=0, hidden, none)');
         }
     }
 
     // Debug - test mapowania kierunków dla różnych obrotów
     testNavigationMapping() {
-        console.log('🧪 TEST NAVIGATION MAPPING: Test mapowania kierunków dla obrotu', this.viewer.rotation + '°');
 
         const directions = ['up', 'down', 'left', 'right'];
 
@@ -535,45 +511,29 @@ class ViewportManager {
             console.log(`   ${dir.toUpperCase()} → ${actualDirection.toUpperCase()}`);
         });
 
-        console.log('\n🧪 SPRAWDŹ: Czy te mapowania są poprawne dla obrotu ' + this.viewer.rotation + '°?');
-        console.log('   - Przycisk UP powinien przesuwać w kierunku "góry" obróconeji mapy');
-        console.log('   - Przycisk RIGHT powinien przesuwać w kierunku "prawa" obróconeji mapy');
+
     }
 }
 
-// Debug - sprawdź czy klasa jest dostępna
-console.log('✅ ViewportManager class loaded');
-console.log('ViewportManager typeof:', typeof ViewportManager);
-console.log('ViewportManager is function:', typeof ViewportManager === 'function');
 
 // Sprawdź czy ViewportManager ma potrzebne metody
 if (typeof ViewportManager === 'function') {
     const prototype = ViewportManager.prototype;
     const requiredMethods = ['updateZoomDisplay', 'reportCurrentViewport', 'setGMZoomPercent'];
     const missingMethods = requiredMethods.filter(method => typeof prototype[method] !== 'function');
-
-    if (missingMethods.length > 0) {
-        console.error('❌ ViewportManager brakuje metod:', missingMethods);
-    } else {
-        console.log('✅ ViewportManager ma wszystkie wymagane metody');
-    }
 }
 
 // RÓŻNE METODY EKSPORTU - sprawdźmy która zadziała
 try {
     window.ViewportManager = ViewportManager;
-    console.log('✅ window.ViewportManager assigned successfully');
-    console.log('window.ViewportManager type:', typeof window.ViewportManager);
+
 
     // Sprawdź czy przypisanie faktycznie zadziałało
     if (window.ViewportManager && typeof window.ViewportManager === 'function') {
-        console.log('✅ window.ViewportManager verification successful');
 
         // Test tworzenia instancji (bez wykonywania)
         const testConstructor = window.ViewportManager.toString();
-        if (testConstructor.includes('constructor')) {
-            console.log('✅ ViewportManager konstruktor dostępny');
-        }
+
     } else {
         throw new Error('ViewportManager assignment failed verification');
     }
@@ -587,7 +547,6 @@ try {
 try {
     if (typeof window !== 'undefined') {
         window['ViewportManager'] = ViewportManager;
-        console.log('✅ Alternative window[ViewportManager] assigned');
     }
 } catch (e) {
     console.error('❌ Alternative export failed:', e);
@@ -596,7 +555,6 @@ try {
 // Globalny eksport
 try {
     globalThis.ViewportManager = ViewportManager;
-    console.log('✅ globalThis.ViewportManager assigned');
 } catch (e) {
     console.error('❌ globalThis export failed:', e);
 }
@@ -610,5 +568,4 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = ViewportManager;
 }
 
-console.log('🏁 VIEWPORT.JS - KONIEC PLIKU - ViewportManager dostępny:', typeof ViewportManager);
 

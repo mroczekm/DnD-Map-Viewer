@@ -38,21 +38,14 @@ public class MapDataService {
             if (fogSection != null) {
                 @SuppressWarnings("unchecked")
                 List<Map<String, Object>> areas = (List<Map<String, Object>>) fogSection.get("revealedAreas");
-                System.out.println("🔍 PRZED ZAPISEM - sekcja fog zawiera: " + (areas != null ? areas.size() : "null") + " obszarów");
 
                 // Sprawdź czy JSON zawiera mgłę
                 if (jsonData.contains("\"fog\"") && jsonData.contains("revealedAreas")) {
-                    System.out.println("✅ JSON zawiera sekcję fog z revealedAreas");
                 } else {
-                    System.out.println("❌ JSON NIE zawiera poprawnej sekcji fog!");
-                    System.out.println("   JSON fragment: " + jsonData.substring(0, Math.min(200, jsonData.length())));
                 }
             } else {
-                System.out.println("❌ PRZED ZAPISEM - sekcja fog jest null!");
             }
         } else {
-            System.out.println("❌ PRZED ZAPISEM - brak sekcji 'fog' w mapData!");
-            System.out.println("   Klucze w mapData: " + mapData.keySet());
             return;
         }
 
@@ -121,7 +114,6 @@ public class MapDataService {
      */
     @SuppressWarnings("unchecked")
     public synchronized Map<String, Object> getMapData(String mapName) throws IOException {
-        System.out.println("🔒 SYNCHRONIZED getMapData dla: " + mapName);
         Path filePath = Paths.get(DATA_DIR, mapName + "_data.json");
 
         if (!Files.exists(filePath)) {
@@ -139,7 +131,6 @@ public class MapDataService {
 
             } catch (IOException readEx) {
                 lastException = readEx;
-                System.err.println("⚠️ Próba " + (retry + 1) + " odczytu pliku nie powiodła się: " + readEx.getMessage());
 
                 if (retry < 2) {
                     try {
@@ -174,11 +165,9 @@ public class MapDataService {
                 if (fogSection != null) {
                     @SuppressWarnings("unchecked")
                     List<Map<String, Object>> areas = (List<Map<String, Object>>) fogSection.get("revealedAreas");
-                    System.out.println("🔍 ODCZYTANO Z PLIKU - sekcja fog zawiera: " + (areas != null ? areas.size() : "null") + " obszarów");
 
                     // Sprawdź surowy JSON
                     if (jsonData.contains("\"fog\"") && jsonData.contains("revealedAreas")) {
-                        System.out.println("✅ Surowy JSON zawiera sekcję fog");
                         // Znajdź i pokaż sekcję fog w JSON
                         int fogStart = jsonData.indexOf("\"fog\"");
                         if (fogStart >= 0) {

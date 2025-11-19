@@ -23,13 +23,10 @@ public class FogService {
     }
 
     public FogState getFogState(String mapName) {
-        System.out.println("🔍 FOGSERVICE.getFogState wywoływane dla: " + mapName);
-
         try {
             Map<String, Object> mapData = mapDataService.getMapData(mapName);
 
             if (mapData == null) {
-                System.out.println("❌ mapDataService.getMapData zwróciło null dla: " + mapName);
                 return new FogState(mapName, new ArrayList<>());
             }
 
@@ -37,18 +34,14 @@ public class FogService {
             Map<String, Object> fogSection = (Map<String, Object>) mapData.get("fog");
 
             if (fogSection == null) {
-                System.out.println("❌ Brak sekcji 'fog' w mapData dla: " + mapName);
                 return new FogState(mapName, new ArrayList<>());
             }
-
-            System.out.println("✅ Znaleziono sekcję fog dla: " + mapName);
 
             // Konwertuj dane mgły na FogState
             String fogMapName = (String) fogSection.get("mapName");
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> areasData = (List<Map<String, Object>>) fogSection.get("revealedAreas");
 
-            System.out.println("🔍 areasData dla " + mapName + ": " + (areasData != null ? areasData.size() : "null"));
 
             List<FogState.FogPoint> revealedAreas = new ArrayList<>();
             if (areasData != null) {
@@ -68,16 +61,13 @@ public class FogService {
             }
 
             FogState result = new FogState(fogMapName != null ? fogMapName : mapName, revealedAreas);
-
-            System.out.println("✅ FOGSERVICE zwraca dla " + mapName + ": " + revealedAreas.size() + " obszarów");
             return result;
 
         } catch (Exception e) {
-            System.err.println("❌ BŁĄD odczytu stanu mgły dla mapy: " + mapName);
-            System.err.println("❌ Szczegóły błędu: " + e.getMessage());
+            System.err.println("BŁĄD odczytu stanu mgły dla mapy: " + mapName);
+            System.err.println("Szczegóły błędu: " + e.getMessage());
 
             // ZAWSZE zwróć jakąkolwiek mgłę - nie null
-            System.out.println("🔄 Zwracam pustą mgłę jako fallback dla mapy: " + mapName);
             return new FogState(mapName, new ArrayList<>());
         }
     }
@@ -87,14 +77,6 @@ public class FogService {
         String mapName = fogState.getMapName();
         int areaCount = fogState.getRevealedAreas().size();
 
-        System.out.println("🔒 SYNCHRONIZED saveFogState START dla: " + mapName + " (" + areaCount + " obszarów)");
-
-        // DIAGNOSTYKA - jeśli 0 obszarów, pokaż kto to wywołał
-        if (areaCount == 0) {
-            System.out.println("⚠️ UWAGA: saveFogState otrzymał 0 obszarów mgły!");
-            System.out.println("📍 Stack trace:");
-            Thread.dumpStack();
-        }
 
         try {
             // Optymalizuj stan mgły przed zapisem
@@ -112,7 +94,6 @@ public class FogService {
 
             if (mapData == null) {
                 // Plik nie istnieje lub jest uszkodzony - stwórz MINIMALNĄ strukturę
-                System.out.println("🔄 Tworzenie nowego pliku danych dla mapy: " + mapName);
                 mapData = new HashMap<>();
 
                 // Utwórz tylko PODSTAWOWĄ strukturę - bez nadpisywania zaawansowanych ustawień
@@ -139,8 +120,6 @@ public class FogService {
 
                 mapData.put("timestamp", java.time.Instant.now().toString());
                 mapData.put("version", "1.0");
-            } else {
-                System.out.println("✅ Odczytano istniejące dane mapy: " + mapName);
             }
 
             // Zaktualizuj sekcję mgły
@@ -166,21 +145,19 @@ public class FogService {
             // PROSTY zapis do unified system
             try {
                 mapDataService.saveMapData(mapName, mapData);
-                System.out.println("✅ Zapisano mgłę dla mapy: " + mapName + " (" + fogState.getRevealedAreas().size() + " obszarów)");
             } catch (IOException saveEx) {
-                System.err.println("❌ Błąd zapisu pliku danych dla mapy: " + mapName);
-                System.err.println("❌ Błąd I/O: " + saveEx.getMessage());
+                System.err.println("Błąd zapisu pliku danych dla mapy: " + mapName);
+                System.err.println("Błąd I/O: " + saveEx.getMessage());
                 // Po prostu loguj błąd - podgląd odświeży mgłę ręcznie przyciskiem
             }
 
         } catch (Exception e) {
-            System.err.println("❌ Błąd zapisu stanu mgły dla mapy: " + fogState.getMapName());
-            System.err.println("❌ Szczegóły: " + e.getMessage());
+            System.err.println("Błąd zapisu stanu mgły dla mapy: " + fogState.getMapName());
+            System.err.println("Szczegóły: " + e.getMessage());
             e.printStackTrace();
 
         } finally {
             long duration = System.currentTimeMillis() - startTime;
-            System.out.println("🔓 SYNCHRONIZED saveFogState END dla: " + fogState.getMapName() + " w " + duration + "ms");
         }
     }
 
@@ -264,16 +241,10 @@ public class FogService {
 
     public void addRevealedAreas(String mapName, List<com.dnd.controller.FogController.FogPoint> points) {
         FogState fogState = getFogState(mapName);
-        int originalSize = fogState.getRevealedAreas().size();
-
-        System.out.println("🟢 addRevealedAreas dla " + mapName + ": przed=" + originalSize + ", dodaje=" + points.size());
 
         for (com.dnd.controller.FogController.FogPoint point : points) {
             fogState.getRevealedAreas().add(new FogState.FogPoint(point.getX(), point.getY(), point.getRadius(), point.isGridCell()));
         }
-
-        int finalSize = fogState.getRevealedAreas().size();
-        System.out.println("🟢 addRevealedAreas dla " + mapName + ": po=" + finalSize + " (dodano=" + (finalSize - originalSize) + ")");
 
         saveFogState(fogState);
     }
@@ -281,29 +252,16 @@ public class FogService {
     public void removeRevealedAreas(String mapName, List<com.dnd.controller.FogController.FogPoint> points) {
         FogState fogState = getFogState(mapName);
         List<FogState.FogPoint> revealedAreas = fogState.getRevealedAreas();
-        int originalSize = revealedAreas.size();
-
-        System.out.println("🔴 removeRevealedAreas dla " + mapName + ": przed=" + originalSize + ", usuwa_punktów=" + points.size());
 
         for (com.dnd.controller.FogController.FogPoint pointToRemove : points) {
-            System.out.println("  🎯 Usuwam punkt: x=" + pointToRemove.getX() + ", y=" + pointToRemove.getY() + ", radius=" + pointToRemove.getRadius());
-
-            int removedInThisIteration = 0;
             revealedAreas.removeIf(existingPoint -> {
                 double distance = Math.sqrt(
                     Math.pow(existingPoint.getX() - pointToRemove.getX(), 2) +
                     Math.pow(existingPoint.getY() - pointToRemove.getY(), 2)
                 );
-                boolean shouldRemove = distance <= (pointToRemove.getRadius() + 10);
-                if (shouldRemove) {
-                    System.out.println("    🗑️ Usuwam: x=" + existingPoint.getX() + ", y=" + existingPoint.getY() + " (dist=" + Math.round(distance) + ")");
-                }
-                return shouldRemove;
+                return distance <= (pointToRemove.getRadius() + 10);
             });
         }
-
-        int finalSize = revealedAreas.size();
-        System.out.println("🔴 removeRevealedAreas dla " + mapName + ": po=" + finalSize + " (usunięto=" + (originalSize - finalSize) + ")");
 
         saveFogState(fogState);
     }
@@ -321,7 +279,6 @@ public class FogService {
     }
 
     public void resetFog(String mapName) {
-        System.out.println("💥 RESET FOG dla " + mapName + " - kasowanie CAŁEJ mgły!");
         FogState fogState = new FogState(mapName, new ArrayList<>());
         saveFogState(fogState);
     }
